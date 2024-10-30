@@ -1,10 +1,6 @@
 #ifndef LIST_ON_ARRAY_UTILS_H
 #define LIST_ON_ARRAY_UTILS_H
 
-#include <stdint.h>
-#include <stdbool.h>
-#include <stdio.h>
-
 #include "concole.h"
 
 #define MAX(a, b) (((a) > (b)) ? (a) : (b))

@@ -1,4 +1,5 @@
-.PHONY: all build clean logger_build logger_clean logger_rebuild \
+.PHONY: all build clean rebuild \
+		logger_build logger_clean logger_rebuild \
 		clean_all clean_log clean_out clean_obj clean_deps clean_txt clean_bin \
 
 
@@ -44,10 +45,10 @@ endif
 FLAGS += $(ADD_FLAGS)
 
 
-DIRS = 
+DIRS = fist verification
 BUILD_DIRS = $(DIRS:%=$(BUILD_DIR)/%)
 
-SOURCES = main.c
+SOURCES = main.c fist/fist.c verification/verification.c
 
 SOURCES_REL_PATH = $(SOURCES:%=$(SRC_DIR)/%)
 OBJECTS_REL_PATH = $(SOURCES:%.c=$(BUILD_DIR)/%.o)
@@ -60,6 +61,8 @@ start:
 	./$(PROJECT_NAME).out
 
 build: $(PROJECT_NAME).out
+
+rebuild: clean_all build
 
 
 
@@ -87,7 +90,7 @@ logger_clean:
 
 
 
-clean_all: clean_obj clean_deps clean_out stack_clean logger_clean
+clean_all: clean_obj clean_deps clean_out logger_clean
 
 clean: clean_obj clean_deps clean_out
 
