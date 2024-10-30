@@ -64,11 +64,10 @@ build: $(PROJECT_NAME).out
 
 
 $(PROJECT_NAME).out: $(OBJECTS_REL_PATH)
-	@$(COMPILER) $(FLAGS) -o $@ $^  
-# -L../libs/logger -llogger
+	@$(COMPILER) $(FLAGS) -o $@ $^  -L./libs/logger -llogger
 
-$(BUILD_DIR)/%.o : $(SRC_DIR)/%.c | ./$(BUILD_DIR)/ $(BUILD_DIRS) # logger_build
-	@$(COMPILER) $(FLAGS) -I../utils -I../libs -c -MMD -MP $< -o $@
+$(BUILD_DIR)/%.o : $(SRC_DIR)/%.c | ./$(BUILD_DIR)/ $(BUILD_DIRS) logger_build
+	@$(COMPILER) $(FLAGS) -I./utils -I./libs -c -MMD -MP $< -o $@
 
 -include $(DEPS_REL_PATH)
 
@@ -81,10 +80,10 @@ $(BUILD_DIRS):
 logger_rebuild: logger_build logger_clean
 
 logger_build:
-	@make ADD_FLAGS="$(ADD_FLAGS)" FLAGS="$(FLAGS)" DEBUG_=$(DEBUG_) build -C ../libs/logger
+	@make ADD_FLAGS="$(ADD_FLAGS)" FLAGS="$(FLAGS)" DEBUG_=$(DEBUG_) build -C ./libs/logger
 
 logger_clean:
-	make ADD_FLAGS="$(ADD_FLAGS)" clean -C ../libs/logger
+	make ADD_FLAGS="$(ADD_FLAGS)" clean -C ./libs/logger
 
 
 
