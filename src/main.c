@@ -2,8 +2,8 @@
 #include <stdint.h>
 
 #include "logger/liblogger.h"
-#include "verification/verification.h"
 #include "fist/fist.h"
+#include "verification/verification.h"
 
 int main()
 {
@@ -15,7 +15,25 @@ int main()
     //====================
 
     fist_t fist = {};
-    FIST_ERROR_HANDLE(FIST_CTOR(&fist, sizeof(int32_t), 1000), fist_dtor(&fist););
+    FIST_ERROR_HANDLE(FIST_CTOR(&fist, sizeof(size_t), 1000), logger_dtor(); fist_dtor(&fist););
+
+    size_t add_elem_fix = 5;
+    FIST_ERROR_HANDLE(fist_push(&fist, 0, &add_elem_fix), 
+                      logger_dtor(); fist_dtor(&fist););
+    for (size_t add_elem = 10; add_elem < 100; add_elem += 10)
+    {
+        FIST_ERROR_HANDLE(fist_push(&fist, add_elem/10, &add_elem), 
+                          logger_dtor(); fist_dtor(&fist););
+    }
+
+    for (size_t i = 10; i > 0; --i)
+    {
+        const size_t num = i;
+        fprintf(stderr, "\nNUM REMOVE: %zu\n", num);
+        FIST_ERROR_HANDLE(fist_pop  (&fist, num), logger_dtor(); fist_dtor(&fist););
+        FIST_ERROR_HANDLE(fist_print(stderr, fist),    logger_dtor(); fist_dtor(&fist););
+    }
+
 
     fist_dtor(&fist);
 

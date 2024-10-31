@@ -3,25 +3,10 @@
 
 #include <stdio.h>
 
+#include "fist_structs.h"
 #include "utils.h"
 #include "logger/liblogger.h"
 
-
-typedef struct Fist
-{
-    IF_DEBUG(place_in_code_t burn_place;)
-
-    size_t elem_size;
-    size_t capacity;
-    size_t size;
-
-    void* data;
-
-    size_t* next;
-    size_t* prev;
-
-    size_t* free;
-} fist_t;
 
 enum FistError fist_ctor_NOT_USE(fist_t* const fist, const size_t elem_size, const size_t capacity,
                                  const place_in_code_t burn_place);
@@ -41,5 +26,10 @@ enum FistError fist_ctor_NOT_USE(fist_t* const fist, const size_t elem_size, con
 #endif /*NDEBUG*/
 
 void fist_dtor(fist_t* const fist);
+
+enum FistError fist_push(fist_t* const fist, const size_t prev_ind, const void* const add_elem);
+enum FistError fist_pop (fist_t* const fist, const size_t del_ind);
+
+enum FistError fist_print(FILE* out, const fist_t fist);
 
 #endif /*LIST_ON_ARRAY_SRC_FIST_H*/
