@@ -68,13 +68,15 @@ void fist_dtor(fist_t* const fist)
 #endif /*NDEBUG*/
 }
 
+static enum FistError fist_resize_(fist_t* const fist);
+
 enum FistError fist_push(fist_t* const fist, const size_t prev_ind, const void* const add_elem)
 {
     FIST_VERIFY(fist, NULL);
     lassert(add_elem, "");
     lassert(prev_ind <= fist->capacity, "");
 
-    lassert(fist->free, ""); // TODO to realloc
+    FIST_ERROR_HANDLE(fist_resize_(fist));
 
     const size_t elem_ind = fist->free;
     const size_t next_ind = (prev_ind == fist->size ? 0 : fist->next[prev_ind]);
@@ -116,10 +118,112 @@ enum FistError fist_pop (fist_t* const fist, const size_t del_ind)
     return FIST_ERROR_SUCCESS;
 }
 
+//-------------------------------------
+
+static enum FistError fist_resize_arr_(void** arr,                const size_t elem_size,
+                                       const size_t old_capacity, const size_t new_capacity);
+
+static enum FistError fist_resize_(fist_t* const fist)
+{
+    FIST_VERIFY(fist, NULL);
+
+    size_t new_capacity = 0;
+
+    if (fist->size == fist->capacity)
+    {
+        new_capacity = (fist->capacity + 1) * 2;
+    }
+
+    if (new_capacity)
+    {
+        FIST_ERROR_HANDLE(
+            fist_resize_arr_(&fist->data, fist->elem_size,             fist->capacity + 1, 
+                                                                         new_capacity)
+        );
+        FIST_ERROR_HANDLE(
+            fist_resize_arr_((void**)&fist->next, sizeof(*fist->next), fist->capacity + 1, 
+                                                                         new_capacity)
+        );
+        FIST_ERROR_HANDLE(
+            fist_resize_arr_((void**)&fist->prev, sizeof(*fist->next), fist->capacity + 1, 
+                                                                         new_capacity)
+        );
+
+        // fprintf(stderr, "new capacity: %zu\n", new_capacity);
+        // FIST_ERROR_HANDLE(fist_print(stderr, *fist));
+
+        fist->free = fist->capacity + 1;
+        for (size_t free_ind = fist->free; free_ind < new_capacity - 1; ++free_ind)
+        {
+            fist->next[free_ind] = free_ind + 1;
+        }
+
+        fist->capacity = new_capacity - 1;
+    }
+
+    FIST_VERIFY(fist, NULL);
+    return FIST_ERROR_SUCCESS;
+}
+
+
+static void* recalloc_(void* ptrmem, const size_t old_number, const size_t old_size,
+                                     const size_t     number, const size_t     size);
+
+static enum FistError fist_resize_arr_(void** arr,                const size_t elem_size,
+                                       const size_t old_capacity, const size_t new_capacity)
+{
+    lassert(arr, "");
+    lassert(*arr, "");
+    lassert(elem_size, "");
+    lassert(old_capacity, "");
+    lassert(new_capacity, "");
+    
+    void* temp_arr = recalloc_(*arr, old_capacity, elem_size,
+                                     new_capacity, elem_size);
+    if (!temp_arr)
+    {
+        fprintf(stderr, "Can't recalloc_\n");
+        return FIST_ERROR_STANDARD_ERRNO;
+    }
+    *arr = temp_arr; IF_DEBUG(temp_arr = NULL;)
+
+    return FIST_ERROR_SUCCESS;
+}
+
+
+static void* recalloc_(void* ptrmem, const size_t old_number, const size_t old_size,
+                                     const size_t     number, const size_t     size)
+{
+    lassert(ptrmem, "");
+    lassert(number, "");
+    lassert(size  , "");
+
+    if (number * size == old_number * old_size)
+        return ptrmem;
+
+    if (!(ptrmem = realloc(ptrmem, number * size)))
+    {
+        perror("Can't realloc in recalloc_");
+        return NULL;
+    }
+
+    if (number * size > old_number * old_size
+        && !memset((char*)ptrmem + old_number * old_size, 0, number * size - old_number * old_size))
+    {
+        perror("Can't memset in recalloc_");
+        return NULL;
+    }
+
+    return ptrmem;
+}
+
+//-------------------------------------
+
 enum FistError fist_print(FILE* out, const fist_t fist)
 {
-    FIST_VERIFY(&fist, NULL);
+    // FIST_VERIFY(&fist, NULL);
     lassert(out, "");
+
 
     fprintf(out, "DATA: ");
     for (size_t ind = fist.next[0]; ind != 0; ind = fist.next[ind])
@@ -154,8 +258,10 @@ enum FistError fist_print(FILE* out, const fist_t fist)
     }
     fprintf(out, "\n");
 
+    static const size_t LIMIT_SIZE = 20; 
+
     fprintf(out, "FREE: ");
-    for (size_t ind = fist.free, cnt = 0; ind != 0 && cnt < 20; ind = fist.next[ind], ++cnt)
+    for (size_t ind = fist.free, cnt = 0; ind != 0 && cnt < LIMIT_SIZE; ind = fist.next[ind], ++cnt)
     {
         if (fprintf(out, "%-3zu ", ind) <= 0)
         {
@@ -167,7 +273,7 @@ enum FistError fist_print(FILE* out, const fist_t fist)
     fprintf(out, "\n");
 
     fprintf(out, "DATA order: ");
-    for (size_t ind = 0; ind < 20; ++ind)
+    for (size_t ind = 0; ind < MIN(LIMIT_SIZE, fist.capacity +1); ++ind)
     {
         if (fprintf(out, "%-3zu ", *((size_t*)fist.data + ind)) <= 0)
         {
@@ -178,7 +284,7 @@ enum FistError fist_print(FILE* out, const fist_t fist)
     fprintf(out, "\n");
 
     fprintf(out, "NEXT order: ");
-    for (size_t ind = 0; ind < 20; ++ind)
+    for (size_t ind = 0; ind < MIN(LIMIT_SIZE, fist.capacity +1); ++ind)
     {
         if (fprintf(out, "%-3zu ", fist.next[ind]) <= 0)
         {
@@ -189,7 +295,7 @@ enum FistError fist_print(FILE* out, const fist_t fist)
     fprintf(out, "\n");
 
     fprintf(out, "PREV order: ");
-    for (size_t ind = 0; ind < 20; ++ind)
+    for (size_t ind = 0; ind < MIN(LIMIT_SIZE, fist.capacity +1); ++ind)
     {
         if (fprintf(out, "%-3zu ", fist.prev[ind]) <= 0)
         {
@@ -199,6 +305,8 @@ enum FistError fist_print(FILE* out, const fist_t fist)
     }
     fprintf(out, "\n");
 
-    FIST_VERIFY(&fist, NULL);
+    fprintf(out, "\n");
+
+    // FIST_VERIFY(&fist, NULL); //FIXME
     return FIST_ERROR_SUCCESS;
 }

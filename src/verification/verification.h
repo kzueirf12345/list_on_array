@@ -4,6 +4,7 @@
 #include "assert.h"
 
 #include "../fist/fist_structs.h"
+#include "../fist/fist.h"
 #include "logger/liblogger.h"
 
 enum FistError
@@ -29,6 +30,7 @@ enum FistError
     FIST_ERROR_SIZE_BIGGER_CAPACITY = 18,
     FIST_ERROR_CAPACITY_IS_ZERO     = 19,
     FIST_ERROR_POP_ARG_NVALID       = 20,
+    FIST_ERROR_FREE_CIRCLE          = 21,
     FIST_ERROR_UNKNOWN              = 30
 };
 static_assert(FIST_ERROR_SUCCESS == 0);
@@ -52,11 +54,13 @@ const char* fist_strerror(const enum FistError error);
 
 enum FistError fist_verify_NOT_USE(const fist_t* const fist);
 
+//FIXME change fist_print on dumb
 #define FIST_VERIFY(fist, elem_to_str)                                                              \
         do {                                                                                        \
             const enum FistError error = fist_verify_NOT_USE(fist);                                 \
             if (error)                                                                              \
             {                                                                                       \
+                fist_print(stderr, *fist);                                                          \
                 lassert(false, "Fist error: %s", fist_strerror(error));                             \
             }                                                                                       \
         } while(0)
