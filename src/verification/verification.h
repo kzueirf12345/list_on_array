@@ -6,6 +6,7 @@
 #include "../fist/fist_structs.h"
 #include "../fist/fist.h"
 #include "logger/liblogger.h"
+#include "../dumb/dumb.h"
 
 enum FistError
 {
@@ -55,13 +56,13 @@ const char* fist_strerror(const enum FistError error);
 
 enum FistError fist_verify_NOT_USE(const fist_t* const fist);
 
-//FIXME change fist_print on dumb
+
 #define FIST_VERIFY(fist, elem_to_str)                                                              \
         do {                                                                                        \
             const enum FistError error = fist_verify_NOT_USE(fist);                                 \
             if (error)                                                                              \
             {                                                                                       \
-                fist_print(stderr, fist);                                                           \
+                FIST_DUMB(fist, elem_to_str);                                                       \
                 lassert(false, "Fist error: %s", fist_strerror(error));                             \
             }                                                                                       \
         } while(0)

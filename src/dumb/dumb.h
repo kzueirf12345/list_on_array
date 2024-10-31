@@ -34,9 +34,9 @@ enum DumbError dumb_dtor(void);
 enum DumbError dumb_set_out_file(const char* const filename);
 
 void fist_dumb_NOT_USE (const fist_t* const fist, const place_in_code_t call_place, 
-                                  int (*elem_to_str)
-                                      (const void* const elem, const size_t   elem_size,
-                                       char* const *     str,  const size_t mx_str_size));
+                        int (*elem_to_str)
+                            (const void* const elem, const size_t   elem_size,
+                             char* const *     str,  const size_t mx_str_size));
 
 #define FIST_DUMB(fist, elem_to_str)                                                                \
         fist_dumb_NOT_USE(fist,                                                                     \

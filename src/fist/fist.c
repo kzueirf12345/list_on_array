@@ -220,7 +220,7 @@ static void* recalloc_(void* ptrmem, const size_t old_number, const size_t old_s
 
 enum FistError fist_print(FILE* out, const fist_t* const fist)
 {
-    // FIST_VERIFY(&fist, NULL);
+    FIST_VERIFY(fist, NULL);
     lassert(out, "");
 
 
@@ -306,7 +306,7 @@ enum FistError fist_print(FILE* out, const fist_t* const fist)
 
     fprintf(out, "\n");
 
-    // FIST_VERIFY(&fist, NULL); //FIXME
+    FIST_VERIFY(fist, NULL);
     return FIST_ERROR_SUCCESS;
 }
 

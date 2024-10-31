@@ -29,8 +29,9 @@ int main()
     {
         FIST_ERROR_HANDLE(fist_push(&fist, add_elem/10, &add_elem), 
                                                      logger_dtor(); dumb_dtor(); fist_dtor(&fist););
-        FIST_DUMB(&fist, NULL);
     }
+
+    FIST_DUMB(&fist, NULL);
 
     for (size_t i = 10; i > 0; --i)
     {

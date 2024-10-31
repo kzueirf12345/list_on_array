@@ -102,8 +102,8 @@ enum DumbError dumb_set_out_file(const char* const filename)
 static const char* 
     handle_invalid_ptr_ (const void* const check_ptr);
 int is_empty_file_      (FILE* file);
-int data_to_lX_str      (const void* const data, const size_t size, char* const * lX_str,
-                         const size_t lX_str_size);
+int data_to_str_      (const void* const data, const size_t size, char* const * str,
+                         const size_t str_size);
 int dumb_arr_           (const fist_t* const fist, const void* const arr, const size_t elem_size, 
                          const size_t print_count, 
                          int (*elem_to_str)
@@ -118,11 +118,11 @@ int dumb_arr_           (const fist_t* const fist, const void* const arr, const 
         } while(0)
 
 void fist_dumb_NOT_USE (const fist_t* const fist, const place_in_code_t call_place, 
-                                  int (*elem_to_str)
-                                      (const void* const elem, const size_t   elem_size,
-                                       char* const *     str,  const size_t mx_str_size))
+                        int (*elem_to_str)
+                            (const void* const elem, const size_t   elem_size,
+                             char* const *     str,  const size_t mx_str_size))
 {
-    if (!elem_to_str) elem_to_str = data_to_lX_str;
+    if (!elem_to_str) elem_to_str = data_to_str_;
 
     if (is_empty_file_(DUMBER_.file) <= 0) fprintf(DUMBER_.file, HTML_INTRO_);
 
@@ -144,9 +144,9 @@ void fist_dumb_NOT_USE (const fist_t* const fist, const place_in_code_t call_pla
         return;
     }
 
-    const char*           fist_name_buf      = handle_invalid_ptr_(fist->name           );
-    const char*           fist_file_burn_buf = handle_invalid_ptr_(fist->burn_place.file);
-    const char*           fist_func_burn_buf = handle_invalid_ptr_(fist->burn_place.func);
+    const char*           fist_name_buf      = handle_invalid_ptr_( fist->name           );
+    const char*           fist_file_burn_buf = handle_invalid_ptr_( fist->burn_place.file);
+    const char*           fist_func_burn_buf = handle_invalid_ptr_( fist->burn_place.func);
     fist_name_buf       = fist_name_buf      ? fist_name_buf      : fist->name;
     fist_file_burn_buf  = fist_file_burn_buf ? fist_file_burn_buf : fist->burn_place.file;
     fist_func_burn_buf  = fist_func_burn_buf ? fist_func_burn_buf : fist->burn_place.func;
@@ -254,7 +254,7 @@ void fist_dumb_NOT_USE (const fist_t* const fist, const place_in_code_t call_pla
            print_count      = MIN(print_count,     fist->size);
     size_t print_count_free = MIN(MAX_PRINT_COUNT, fist->capacity - print_count);
 
-    for (size_t ind = 0; ind < MAX(print_count, print_count_free); ++ind)
+    for (size_t ind = 1; ind < MAX(print_count, print_count_free) + 1; ++ind)
     {
         LOGG_AND_FPRINTF_("%-2zu ", ind);
     }
@@ -412,7 +412,6 @@ int is_empty_file_(FILE* file)
     return res;
 }
 
-
 int dumb_arr_(const fist_t* const fist, const void* const arr, const size_t elem_size, 
               const size_t print_count, int (*elem_to_str)
                                             (const void* const elem, const size_t   elem_size,
@@ -452,13 +451,16 @@ int dumb_arr_(const fist_t* const fist, const void* const arr, const size_t elem
 }
 #undef LOGG_AND_FPRINTF_
 
+#ifndef FIST_INOUT_ELEM_CODE
+#define FIST_INOUT_ELEM_CODE "%lX"
+#endif /*FIST_INOUT_ELEM_CODE*/
 
-int data_to_lX_str(const void* const data, const size_t size, char* const * lX_str,
-                   const size_t lX_str_size)
+int data_to_str_(const void* const data, const size_t size, char* const * str,
+                   const size_t str_size)
 {
     lassert(data, "");
     lassert(size, "");
-    lassert(lX_str, "");
+    lassert(str, "");
     
     char temp_str[sizeof(uint64_t) * 4] = {};
     for (size_t offset = 0; offset < size; 
@@ -466,7 +468,7 @@ int data_to_lX_str(const void* const data, const size_t size, char* const * lX_s
     {
         if (size - offset >= sizeof(uint64_t))
         {
-            if (snprintf(temp_str, sizeof(uint64_t) * 4, "%lX", 
+            if (snprintf(temp_str, sizeof(uint64_t) * 4, FIST_INOUT_ELEM_CODE,
                          *(const uint64_t*)((const char*)data + offset)) <= 0)
             {
                 perror("Can't snprintf byte on temp_str");
@@ -475,7 +477,7 @@ int data_to_lX_str(const void* const data, const size_t size, char* const * lX_s
         }
         else
         {
-            if (snprintf(temp_str, sizeof(uint8_t) * 4, "%lX", 
+            if (snprintf(temp_str, sizeof(uint8_t) * 4, FIST_INOUT_ELEM_CODE, 
                          *(const uint8_t*)((const char*)data + offset)) <= 0)
             {
                 perror("Can't snprintf byte on temp_str");
@@ -483,9 +485,9 @@ int data_to_lX_str(const void* const data, const size_t size, char* const * lX_s
             }
         }
 
-        if (!strncat(*lX_str, temp_str, lX_str_size))
+        if (!strncat(*str, temp_str, str_size))
         {
-            perror("Can't stract lX_str and temp_str");
+            perror("Can't stract str and temp_str");
             return 1;
         }
     }
