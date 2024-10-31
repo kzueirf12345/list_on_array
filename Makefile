@@ -45,10 +45,10 @@ endif
 FLAGS += $(ADD_FLAGS)
 
 
-DIRS = fist verification
+DIRS = fist verification dumb verify_utils
 BUILD_DIRS = $(DIRS:%=$(BUILD_DIR)/%)
 
-SOURCES = main.c fist/fist.c verification/verification.c
+SOURCES = main.c fist/fist.c verification/verification.c dumb/dumb.c verify_utils/verify_utils.c
 
 SOURCES_REL_PATH = $(SOURCES:%=$(SRC_DIR)/%)
 OBJECTS_REL_PATH = $(SOURCES:%.c=$(BUILD_DIR)/%.o)
@@ -95,7 +95,7 @@ clean_all: clean_obj clean_deps clean_out logger_clean
 clean: clean_obj clean_deps clean_out
 
 clean_log:
-	rm -rf ./log/*.log
+	rm -rf ./log/*
 
 clean_out:
 	rm -rf ./*.out

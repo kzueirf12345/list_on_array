@@ -8,6 +8,7 @@
 
 typedef struct Fist
 {
+    IF_DEBUG(const char* name;)
     IF_DEBUG(place_in_code_t burn_place;)
 
     size_t elem_size;

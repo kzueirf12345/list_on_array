@@ -31,6 +31,7 @@ enum FistError
     FIST_ERROR_CAPACITY_IS_ZERO     = 19,
     FIST_ERROR_POP_ARG_NVALID       = 20,
     FIST_ERROR_FREE_CIRCLE          = 21,
+    FIST_ERROR_LOGGER_ERROR         = 22,
     FIST_ERROR_UNKNOWN              = 30
 };
 static_assert(FIST_ERROR_SUCCESS == 0);
@@ -60,7 +61,7 @@ enum FistError fist_verify_NOT_USE(const fist_t* const fist);
             const enum FistError error = fist_verify_NOT_USE(fist);                                 \
             if (error)                                                                              \
             {                                                                                       \
-                fist_print(stderr, *fist);                                                          \
+                fist_print(stderr, fist);                                                           \
                 lassert(false, "Fist error: %s", fist_strerror(error));                             \
             }                                                                                       \
         } while(0)

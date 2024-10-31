@@ -57,5 +57,7 @@ dkms.conf
 
 *.log
 CMakePresets.json
+*.html
+*.dot
 
 doxygen

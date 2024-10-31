@@ -8,6 +8,7 @@
 
 #include "verification.h"
 #include "logger/liblogger.h"
+#include "../verify_utils/verify_utils.h"
 
 #define CASE_ENUM_TO_STRING_(error) case error: return #error
 const char* fist_strerror(const enum FistError error)
@@ -36,6 +37,7 @@ const char* fist_strerror(const enum FistError error)
         CASE_ENUM_TO_STRING_(FIST_ERROR_CAPACITY_IS_ZERO);
         CASE_ENUM_TO_STRING_(FIST_ERROR_POP_ARG_NVALID);
         CASE_ENUM_TO_STRING_(FIST_ERROR_FREE_CIRCLE);
+        CASE_ENUM_TO_STRING_(FIST_ERROR_LOGGER_ERROR);
         CASE_ENUM_TO_STRING_(FIST_ERROR_UNKNOWN);
     default:
         return "UNKNOWN_FIST_ERROR";
@@ -47,21 +49,10 @@ const char* fist_strerror(const enum FistError error)
 
 #ifndef NDEBUG
 
-enum PtrState
-{
-    PTR_STATES_VALID   = 0,
-    PTR_STATES_NULL    = 1,
-    PTR_STATES_NVALID  = 2,
-    PTR_STATES_ERROR   = 3
-};
-static_assert(PTR_STATES_VALID == 0);
-
-static enum PtrState is_valid_ptr_(const void* const ptr);
-
 enum FistError fist_verify_NOT_USE(const fist_t* const fist)
 {
 
-    switch (is_valid_ptr_(fist))
+    switch (is_valid_ptr(fist))
     {
         case PTR_STATES_VALID:      break;
         case PTR_STATES_NULL:       return FIST_ERROR_FIST_IS_NULL;
@@ -73,7 +64,7 @@ enum FistError fist_verify_NOT_USE(const fist_t* const fist)
             return FIST_ERROR_UNKNOWN;
     }
 
-    switch (is_valid_ptr_(fist->data))
+    switch (is_valid_ptr(fist->data))
     {
         case PTR_STATES_VALID:      break;
         case PTR_STATES_NULL:       return FIST_ERROR_DATA_IS_NULL;
@@ -85,7 +76,7 @@ enum FistError fist_verify_NOT_USE(const fist_t* const fist)
             return FIST_ERROR_UNKNOWN;
     }
 
-    switch (is_valid_ptr_(fist->next))
+    switch (is_valid_ptr(fist->next))
     {
         case PTR_STATES_VALID:      break;
         case PTR_STATES_NULL:       return FIST_ERROR_NEXT_IS_NULL;
@@ -97,7 +88,7 @@ enum FistError fist_verify_NOT_USE(const fist_t* const fist)
             return FIST_ERROR_UNKNOWN;
     }
 
-    switch (is_valid_ptr_(fist->prev))
+    switch (is_valid_ptr(fist->prev))
     {
         case PTR_STATES_VALID:      break;
         case PTR_STATES_NULL:       return FIST_ERROR_PREV_IS_NULL;
@@ -158,56 +149,6 @@ enum FistError fist_verify_NOT_USE(const fist_t* const fist)
     if (free_size + fist->size != fist->capacity) return FIST_ERROR_FREE_NCOMPLETE;
 
     return FIST_ERROR_SUCCESS;
-}
-
-static enum PtrState is_valid_ptr_(const void* const ptr)
-{
-    if (errno)
-    {
-        perror("Errno enter in valid ptr check with error");
-        return PTR_STATES_ERROR;
-    }
-
-    if (ptr == NULL)
-    {
-        return PTR_STATES_NULL;
-    }
-
-    char filename[] = "/tmp/chupapi_munyanya.XXXXXX";
-    const int fd = mkstemp(filename);
-
-    if (fd == -1) 
-    {
-        perror("Can't mkstemp file");
-        return PTR_STATES_ERROR;
-    }
-
-    const ssize_t write_result = write(fd, ptr, 1);
-
-    if (remove(filename))
-    {
-        perror("Can't remove temp file");
-        return PTR_STATES_ERROR;
-    }
-
-    if (close(fd))
-    {
-        perror("Can't close temp file");
-        return PTR_STATES_ERROR;
-    }
-
-    if (write_result == 1) 
-    {
-        return PTR_STATES_VALID;
-    } 
-    else if (errno == EFAULT) 
-    {
-        errno = 0;
-        return PTR_STATES_NVALID;
-    }
-    
-    perror("Unpredictable errno state, after write into temp file");
-    return PTR_STATES_ERROR;
 }
 
 #endif /*NDEBUG*/
