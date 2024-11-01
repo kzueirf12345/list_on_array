@@ -43,7 +43,6 @@ static struct
     const char* dot_name;
     const char* png_name;
     FILE* dot_file;
-    FILE* png_file;
     FILE* html_file;
 } DUMBER_ = {};
 
@@ -54,14 +53,13 @@ static void DUMBER_is_init_lasserts_(void)
     lassert(DUMBER_.dot_name,  "DUMBER_ is not init");
     lassert(DUMBER_.dot_file,  "DUMBER_ is not init");
     lassert(DUMBER_.png_name,  "DUMBER_ is not init");
-    lassert(DUMBER_.png_file,  "DUMBER_ is not init");
 }
 
 enum DumbError dumb_ctor(void)
 {
     lassert(!DUMBER_.html_name || !DUMBER_.html_file, "");
     lassert(!DUMBER_.dot_name  || !DUMBER_.dot_file,  "");
-    lassert(!DUMBER_.png_name  || !DUMBER_.png_file,  "");
+    lassert(!DUMBER_.png_name,                        "");
 
     DUMBER_.html_name = "./log/dumb.html";
     if (!(DUMBER_.html_file = fopen(DUMBER_.html_name, "ab")))
@@ -78,11 +76,6 @@ enum DumbError dumb_ctor(void)
     }
 
     DUMBER_.png_name = "./log/dumb.png";
-    if (!(DUMBER_.png_file = fopen(DUMBER_.png_name, "ab")))
-    {
-        perror("Can't open png_file");
-        return DUMB_ERROR_FAILURE;
-    }
 
     return DUMB_ERROR_SUCCESS;
 }
@@ -105,11 +98,6 @@ enum DumbError dumb_dtor(void)
     }
     IF_DEBUG(DUMBER_.dot_name = NULL;)
 
-    if (fclose(DUMBER_.png_file))
-    {
-        perror("Can't close png_file");
-        return DUMB_ERROR_FAILURE;
-    }
     IF_DEBUG(DUMBER_.png_name = NULL;)
 
     return DUMB_ERROR_SUCCESS;
@@ -141,7 +129,8 @@ enum DumbError dumb_set_out_png_file(const char* const filename)
     DUMBER_is_init_lasserts_();
     lassert(filename, "");
 
-    return dumb_set_out_file_(filename, &DUMBER_.png_file, &DUMBER_.png_name);
+    DUMBER_.png_name = filename;
+    return DUMB_ERROR_SUCCESS;
 }
 
 enum DumbError dumb_set_out_file_(const char*  const filename, FILE** const file, 
@@ -173,18 +162,22 @@ enum DumbError dumb_set_out_file_(const char*  const filename, FILE** const file
 static const char* 
     handle_invalid_ptr_ (const void* const check_ptr);
 int is_empty_file_      (FILE* html_file);
-int data_to_str_      (const void* const data, const size_t size, char* const * str,
+int data_to_str_        (const void* const data, const size_t size, char* const * str,
                          const size_t str_size);
 int dumb_arr_           (const fist_t* const fist, const void* const arr, const size_t elem_size, 
                          const size_t print_count, 
                          int (*elem_to_str)
                                 (const void* const elem, const size_t   elem_size,
                                  char* const *     str,  const size_t mx_str_size));
+int create_fist_png_    (const fist_t* const fist, const size_t print_count,
+                         int (*elem_to_str)
+                             (const void* const elem, const size_t   elem_size,
+                              char* const *     str,  const size_t mx_str_size));
 
 
 #define LOGG_AND_FPRINTF_(format, ...)                                                              \
         do {                                                                                        \
-            fprintf(DUMBER_.html_file, format, ##__VA_ARGS__);                                           \
+            fprintf(DUMBER_.html_file, format, ##__VA_ARGS__);                                      \
             fprintf(stderr,       format, ##__VA_ARGS__);                                           \
         } while(0)
 
@@ -250,6 +243,7 @@ void fist_dumb_NOT_USE (const fist_t* const fist, const place_in_code_t call_pla
         LOGG_AND_FPRINTF_(" ");
 
     size_t print_count = MIN(fist->capacity + 1, MAX_PRINT_COUNT);
+    const size_t print_count_graph = print_count;
 
     for (size_t ind = 0; ind < print_count; ++ind)
     {
@@ -452,11 +446,89 @@ void fist_dumb_NOT_USE (const fist_t* const fist, const place_in_code_t call_pla
 
     LOGG_AND_FPRINTF_("}");    
     fprintf(stderr, "\n");
+
+    if (create_fist_png_(fist, print_count_graph, elem_to_str))
+    {
+        fprintf(stderr, "Can't create fist png\n");
+        return;
+    }
+
+    static const size_t CREATE_PNG_CMD_SIZE = 256;
+    char* create_png_cmd = calloc(CREATE_PNG_CMD_SIZE, sizeof(char));
+
+    if (snprintf(create_png_cmd, CREATE_PNG_CMD_SIZE, 
+                 "dot -Tpng %s -o %s >/dev/null", DUMBER_.dot_name, DUMBER_.png_name) <= 0)
+    {
+        fprintf(stderr, "Can't snprintf creare_png_cmd\n");
+        free(create_png_cmd); create_png_cmd = NULL;
+        return;
+    }
+    
+    if (system(create_png_cmd))
+    {
+        fprintf(stderr, "Can't call system create png\n");
+        free(create_png_cmd); create_png_cmd = NULL;
+        return;
+    }
+
+    free(create_png_cmd); create_png_cmd = NULL;
 }
 
 //==========================================================================================
+//TODO
+int create_fist_png_(const fist_t* const fist, const size_t print_count,
+                     int (*elem_to_str)
+                         (const void* const elem, const size_t   elem_size,
+                          char* const *     str,  const size_t mx_str_size))
+{
+    if (!fist)          return -1;
+    if (!elem_to_str)   return -1;
+    if (!fist->data)    return -1;
+    if (!fist->next)    return -1;
+    if (!fist->prev)    return -1;
+    if (!print_count)   return -1;
 
+    fprintf(DUMBER_.dot_file, "digraph {\n");
 
+    const size_t elem_str_buf_size = 4 * MAX(fist->elem_size, sizeof(*fist->next));
+    char*        elem_str_buf = calloc(1, elem_str_buf_size);
+
+    for (size_t ind = 0; ind < print_count; ++ind)
+    {
+        if (elem_to_str((char*)fist->data + ind * fist->elem_size, fist->elem_size,
+                        &elem_str_buf, elem_str_buf_size))
+        {
+            fprintf(stderr, "\nError elem_to_str\n");
+            free(elem_str_buf); elem_str_buf = NULL;
+            return -1;
+        }
+
+        fprintf(DUMBER_.dot_file, 
+                    "node%-4zu [shape=Mrecord; label = "
+                    "\" { %-4zu | data = %-7s | next = %-7zu | prev = %-7zu } \"];\n",
+                ind, ind, elem_str_buf, fist->next[ind], fist->prev[ind]);
+
+        if (!memset(elem_str_buf, 0, elem_str_buf_size))
+        {
+            fprintf(stderr, "\nCan't memset elem_str_buf\n");
+            free(elem_str_buf); elem_str_buf = NULL;
+            return -1;
+        }
+    }
+    fprintf(DUMBER_.dot_file, "\n");
+
+    for (size_t ind = 0; ind < print_count - 1; ++ind)
+    {
+        fprintf(DUMBER_.dot_file, "node%-4zu -> node%-4zu [weight=1000; color=black; ];\n",
+                ind, ind + 1);
+    }
+    fprintf(DUMBER_.dot_file, "\n");
+
+    free(elem_str_buf); elem_str_buf = NULL;
+
+    fprintf(DUMBER_.dot_file, "}");
+    return 0;
+}
 
 //==========================================================================================
 
