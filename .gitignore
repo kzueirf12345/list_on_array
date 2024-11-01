@@ -55,9 +55,8 @@ dkms.conf
 .vscode
 .cache
 
-*.log
+log/
 CMakePresets.json
-*.html
-*.dot
+
 
 doxygen

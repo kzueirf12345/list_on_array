@@ -35,27 +35,52 @@ const char* dumb_strerror(const enum DumbError error)
 }
 #undef CASE_ENUM_TO_STRING_
 
+//==========================================================================================
 
 static struct 
 {
-    const char* name;
-    FILE* file;
+    const char* html_name;
+    const char* dot_name;
+    const char* png_name;
+    FILE* dot_file;
+    FILE* png_file;
+    FILE* html_file;
 } DUMBER_ = {};
 
 static void DUMBER_is_init_lasserts_(void)
 {
-    lassert(DUMBER_.name, "DUMBER_ is not init");
-    lassert(DUMBER_.file, "DUMBER_ is not init");
+    lassert(DUMBER_.html_name, "DUMBER_ is not init");
+    lassert(DUMBER_.html_file, "DUMBER_ is not init");
+    lassert(DUMBER_.dot_name,  "DUMBER_ is not init");
+    lassert(DUMBER_.dot_file,  "DUMBER_ is not init");
+    lassert(DUMBER_.png_name,  "DUMBER_ is not init");
+    lassert(DUMBER_.png_file,  "DUMBER_ is not init");
 }
 
 enum DumbError dumb_ctor(void)
 {
-    lassert(!DUMBER_.name || !DUMBER_.file, "");
+    lassert(!DUMBER_.html_name || !DUMBER_.html_file, "");
+    lassert(!DUMBER_.dot_name  || !DUMBER_.dot_file,  "");
+    lassert(!DUMBER_.png_name  || !DUMBER_.png_file,  "");
 
-    DUMBER_.name = "./log/dumb.html";
-    if (!(DUMBER_.file = fopen(DUMBER_.name, "ab")))
+    DUMBER_.html_name = "./log/dumb.html";
+    if (!(DUMBER_.html_file = fopen(DUMBER_.html_name, "ab")))
     {
-        perror("Can't open file");
+        perror("Can't open html_file");
+        return DUMB_ERROR_FAILURE;
+    }
+
+    DUMBER_.dot_name = "./log/dumb.dot";
+    if (!(DUMBER_.dot_file = fopen(DUMBER_.dot_name, "ab")))
+    {
+        perror("Can't open dot_file");
+        return DUMB_ERROR_FAILURE;
+    }
+
+    DUMBER_.png_name = "./log/dumb.png";
+    if (!(DUMBER_.png_file = fopen(DUMBER_.png_name, "ab")))
+    {
+        perror("Can't open png_file");
         return DUMB_ERROR_FAILURE;
     }
 
@@ -66,30 +91,76 @@ enum DumbError dumb_dtor(void)
 {
     DUMBER_is_init_lasserts_();
 
-    if (fclose(DUMBER_.file))
+    if (fclose(DUMBER_.html_file))
     {
-        perror("Can't close file");
+        perror("Can't close html_file");
         return DUMB_ERROR_FAILURE;
     }
-    IF_DEBUG(DUMBER_.name = NULL;)
+    IF_DEBUG(DUMBER_.html_name = NULL;)
+
+    if (fclose(DUMBER_.dot_file))
+    {
+        perror("Can't close dot_file");
+        return DUMB_ERROR_FAILURE;
+    }
+    IF_DEBUG(DUMBER_.dot_name = NULL;)
+
+    if (fclose(DUMBER_.png_file))
+    {
+        perror("Can't close png_file");
+        return DUMB_ERROR_FAILURE;
+    }
+    IF_DEBUG(DUMBER_.png_name = NULL;)
 
     return DUMB_ERROR_SUCCESS;
 }
 
-enum DumbError dumb_set_out_file(const char* const filename)
+//==========================================================================================
+
+enum DumbError dumb_set_out_file_(const char*  const filename, FILE** const file, 
+                                  const char** const old_filename);
+
+enum DumbError dumb_set_out_html_file(const char* const filename)
 {
     DUMBER_is_init_lasserts_();
     lassert(filename, "");
 
-    DUMBER_.name = filename;
+    return dumb_set_out_file_(filename, &DUMBER_.html_file, &DUMBER_.html_name);
+}
 
-    if (DUMBER_.file && fclose(DUMBER_.file))
+enum DumbError dumb_set_out_dot_file(const char* const filename)
+{
+    DUMBER_is_init_lasserts_();
+    lassert(filename, "");
+
+    return dumb_set_out_file_(filename, &DUMBER_.dot_file, &DUMBER_.dot_name);
+}
+
+enum DumbError dumb_set_out_png_file(const char* const filename)
+{
+    DUMBER_is_init_lasserts_();
+    lassert(filename, "");
+
+    return dumb_set_out_file_(filename, &DUMBER_.png_file, &DUMBER_.png_name);
+}
+
+enum DumbError dumb_set_out_file_(const char*  const filename, FILE** const file, 
+                                  const char** const old_filename)
+{
+    DUMBER_is_init_lasserts_();
+    lassert(filename, "");
+    lassert(file, "");
+    lassert(old_filename, "");
+
+    *old_filename = filename;
+
+    if (*file && fclose(*file))
     {  
         perror("Can't close file");
         return DUMB_ERROR_FAILURE;
     }
     
-    if (!(DUMBER_.file = fopen(filename, "ab"))){
+    if (!(*file = fopen(*old_filename, "ab"))){
         perror("Can't open file");
         return DUMB_ERROR_FAILURE;
     }
@@ -101,7 +172,7 @@ enum DumbError dumb_set_out_file(const char* const filename)
 
 static const char* 
     handle_invalid_ptr_ (const void* const check_ptr);
-int is_empty_file_      (FILE* file);
+int is_empty_file_      (FILE* html_file);
 int data_to_str_      (const void* const data, const size_t size, char* const * str,
                          const size_t str_size);
 int dumb_arr_           (const fist_t* const fist, const void* const arr, const size_t elem_size, 
@@ -113,7 +184,7 @@ int dumb_arr_           (const fist_t* const fist, const void* const arr, const 
 
 #define LOGG_AND_FPRINTF_(format, ...)                                                              \
         do {                                                                                        \
-            fprintf(DUMBER_.file, format, ##__VA_ARGS__);                                           \
+            fprintf(DUMBER_.html_file, format, ##__VA_ARGS__);                                           \
             fprintf(stderr,       format, ##__VA_ARGS__);                                           \
         } while(0)
 
@@ -124,7 +195,7 @@ void fist_dumb_NOT_USE (const fist_t* const fist, const place_in_code_t call_pla
 {
     if (!elem_to_str) elem_to_str = data_to_str_;
 
-    if (is_empty_file_(DUMBER_.file) <= 0) fprintf(DUMBER_.file, HTML_INTRO_);
+    if (is_empty_file_(DUMBER_.html_file) <= 0) fprintf(DUMBER_.html_file, HTML_INTRO_);
 
     LOGG_AND_FPRINTF_("\n==FIST DUMB==\nDate: %s\nTime: %s\n\n", __DATE__, __TIME__);
 
@@ -382,6 +453,10 @@ void fist_dumb_NOT_USE (const fist_t* const fist, const place_in_code_t call_pla
     LOGG_AND_FPRINTF_("}");    
     fprintf(stderr, "\n");
 }
+
+//==========================================================================================
+
+
 
 //==========================================================================================
 
