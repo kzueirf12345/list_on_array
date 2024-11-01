@@ -52,7 +52,7 @@ enum DumbError dumb_ctor(void)
 {
     lassert(!DUMBER_.name || !DUMBER_.file, "");
 
-    DUMBER_.name = "./log/dumb.dot";
+    DUMBER_.name = "./log/dumb.html";
     if (!(DUMBER_.file = fopen(DUMBER_.name, "ab")))
     {
         perror("Can't open file");
@@ -89,7 +89,7 @@ enum DumbError dumb_set_out_file(const char* const filename)
         return DUMB_ERROR_FAILURE;
     }
     
-    if (!(DUMBER_.file = fopen(filename, "a+b"))){
+    if (!(DUMBER_.file = fopen(filename, "ab"))){
         perror("Can't open file");
         return DUMB_ERROR_FAILURE;
     }
@@ -172,17 +172,17 @@ void fist_dumb_NOT_USE (const fist_t* const fist, const place_in_code_t call_pla
     //------------------------------------------------------------------------------------------
 
                  size_t SKIP_SIZE       = 32;
-    static const size_t MAX_PRINT_COUNT = 100;
+    static const size_t MAX_PRINT_COUNT = 50;
 
     LOGG_AND_FPRINTF_("\t");
     for (size_t i = 0; i < SKIP_SIZE; ++i)
         LOGG_AND_FPRINTF_(" ");
 
-    size_t print_count = MIN(fist->capacity, MAX_PRINT_COUNT);
+    size_t print_count = MIN(fist->capacity + 1, MAX_PRINT_COUNT);
 
     for (size_t ind = 0; ind < print_count; ++ind)
     {
-        LOGG_AND_FPRINTF_("%-2zu ", ind);
+        LOGG_AND_FPRINTF_("%-7zu ", ind);
     }
     LOGG_AND_FPRINTF_("\n");
 
@@ -256,7 +256,7 @@ void fist_dumb_NOT_USE (const fist_t* const fist, const place_in_code_t call_pla
 
     for (size_t ind = 1; ind < MAX(print_count, print_count_free) + 1; ++ind)
     {
-        LOGG_AND_FPRINTF_("%-2zu ", ind);
+        LOGG_AND_FPRINTF_("%-7zu ", ind);
     }
     LOGG_AND_FPRINTF_("\n");
 
@@ -296,7 +296,7 @@ void fist_dumb_NOT_USE (const fist_t* const fist, const place_in_code_t call_pla
                     LOGG_AND_FPRINTF_("\nError elem_to_str\n");
                     break;
                 }
-                LOGG_AND_FPRINTF_("%-2s ", elem_str_buf); 
+                LOGG_AND_FPRINTF_("%-7s ", elem_str_buf); 
 
                 if (!memset(elem_str_buf, 0, elem_str_buf_size))
                 {
@@ -331,7 +331,7 @@ void fist_dumb_NOT_USE (const fist_t* const fist, const place_in_code_t call_pla
                 LOGG_AND_FPRINTF_("\ncur_ind next (%zu) > capacity : (%zu)\n", cur_ind, fist->capacity);
                 break;
             }
-            LOGG_AND_FPRINTF_("%-2zu ", cur_ind); 
+            LOGG_AND_FPRINTF_("%-7zu ", cur_ind); 
         }
         LOGG_AND_FPRINTF_("\n");
     }
@@ -355,7 +355,7 @@ void fist_dumb_NOT_USE (const fist_t* const fist, const place_in_code_t call_pla
                 LOGG_AND_FPRINTF_("\ncur_ind prev (%zu) > capacity : (%zu)\n", cur_ind, fist->capacity);
                 break;
             }
-            LOGG_AND_FPRINTF_("%-2zu ", cur_ind); 
+            LOGG_AND_FPRINTF_("%-7zu ", cur_ind); 
         }
         LOGG_AND_FPRINTF_("\n");
     }
@@ -373,7 +373,7 @@ void fist_dumb_NOT_USE (const fist_t* const fist, const place_in_code_t call_pla
             LOGG_AND_FPRINTF_("\ncur_ind free (%zu) > capacity : (%zu)\n", cur_ind, fist->capacity);
             break;
         }
-        LOGG_AND_FPRINTF_("%-2zu ", cur_ind); 
+        LOGG_AND_FPRINTF_("%-7zu ", cur_ind); 
     }
     LOGG_AND_FPRINTF_("\n");
 
@@ -417,13 +417,18 @@ int dumb_arr_(const fist_t* const fist, const void* const arr, const size_t elem
                                             (const void* const elem, const size_t   elem_size,
                                             char* const *     str,  const size_t mx_str_size))
 {
+    if (!fist)          return -1;
+    if (!arr)           return -1;
+    if (!elem_size)     return -1;
+    if (!elem_to_str)   return -1;
+
     const size_t elem_str_buf_size = 4 * MAX(elem_size, sizeof(*fist->next));
     char*        elem_str_buf = calloc(1, elem_str_buf_size);
 
     if (!elem_str_buf)
     {
         LOGG_AND_FPRINTF_("Error calloc elem_str_buf\n");
-        return 1;
+        return -1;
     }
 
     for (size_t ind = 0; ind < print_count; ++ind)
@@ -433,9 +438,9 @@ int dumb_arr_(const fist_t* const fist, const void* const arr, const size_t elem
         {
             LOGG_AND_FPRINTF_("\nError elem_to_str\n");
             free(elem_str_buf); elem_str_buf = NULL;
-            return 1;
+            return -1;
         }
-        LOGG_AND_FPRINTF_("%-2s ", elem_str_buf); 
+        LOGG_AND_FPRINTF_("%-7s ", elem_str_buf); 
 
         if (!memset(elem_str_buf, 0, elem_str_buf_size))
         {
@@ -458,9 +463,9 @@ int dumb_arr_(const fist_t* const fist, const void* const arr, const size_t elem
 int data_to_str_(const void* const data, const size_t size, char* const * str,
                    const size_t str_size)
 {
-    lassert(data, "");
-    lassert(size, "");
-    lassert(str, "");
+    if (!data)  return -1;
+    if (!size)  return -1;
+    if (!str)   return -1;
     
     char temp_str[sizeof(uint64_t) * 4] = {};
     for (size_t offset = 0; offset < size; 
@@ -472,7 +477,7 @@ int data_to_str_(const void* const data, const size_t size, char* const * str,
                          *(const uint64_t*)((const char*)data + offset)) <= 0)
             {
                 perror("Can't snprintf byte on temp_str");
-                return 1;
+                return -1;
             }
         }
         else
@@ -481,14 +486,14 @@ int data_to_str_(const void* const data, const size_t size, char* const * str,
                          *(const uint8_t*)((const char*)data + offset)) <= 0)
             {
                 perror("Can't snprintf byte on temp_str");
-                return 1;
+                return -1;
             }
         }
 
         if (!strncat(*str, temp_str, str_size))
         {
             perror("Can't stract str and temp_str");
-            return 1;
+            return -1;
         }
     }
 
