@@ -27,20 +27,17 @@ int main()
     size_t add_elem_fix = 5;
     FIST_ERROR_HANDLE(fist_push(&fist, 0, &add_elem_fix), 
                                                      logger_dtor(); dumb_dtor(); fist_dtor(&fist););
-    for (size_t add_elem = 10; add_elem < 100; add_elem += 10)
+    for (size_t add_elem = 10; add_elem < 1500; add_elem += 10)
     {
         FIST_ERROR_HANDLE(fist_push(&fist, add_elem/10, &add_elem), 
                                                      logger_dtor(); dumb_dtor(); fist_dtor(&fist););
     }
 
-    FIST_DUMB(&fist, NULL);
-
-    for (size_t i = 10; i > 0; --i)
+    for (size_t i = 100; i > 0; --i)
     {
         const size_t num = i;
-        // fprintf(stderr, "\nNUM REMOVE: %zu\n", num);
         FIST_ERROR_HANDLE(fist_pop  (&fist, num),    logger_dtor(); dumb_dtor(); fist_dtor(&fist););
-        // FIST_ERROR_HANDLE(fist_print(stderr, &fist), logger_dtor(); dumb_dtor(); fist_dtor(&fist););
+        FIST_DUMB(&fist, NULL);
     }
 
 

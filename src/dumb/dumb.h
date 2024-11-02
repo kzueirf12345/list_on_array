@@ -31,9 +31,10 @@ const char* dumb_strerror(const enum DumbError error);
 enum DumbError dumb_ctor(void);
 enum DumbError dumb_dtor(void);
 
-enum DumbError dumb_set_out_html_file(const char* const filename);
-enum DumbError dumb_set_out_dot_file (const char* const filename);
-enum DumbError dumb_set_out_png_file (const char* const filename);
+enum DumbError dumb_set_out_html_file       (const char* const filename);
+enum DumbError dumb_set_out_dot_file        (const char* const filename);
+enum DumbError dumb_set_out_png_file        (const char* const filename);
+enum DumbError dumb_set_out_graph_count_file(const char* const filename);
 
 void fist_dumb_NOT_USE (const fist_t* const fist, const place_in_code_t call_place, 
                         int (*elem_to_str)
