@@ -251,11 +251,14 @@ enum DumbError dumb_set_out_graph_count_file(const char* const filename)
 
 //==========================================================================================
 
-static const size_t MAX_PRINT_COUNT = 10;
+static const size_t MAX_PRINT_COUNT = 7;
 
 //NOTE - non assertable
 int data_to_str_        (const void* const data, const size_t size, char* const * str,
                          const size_t str_size); 
+//NOTE - non assertable
+int ind_to_str_         (const void* const data, const size_t size, char* const * str,
+                         const size_t str_size);
 
 //NOTE - non assertable
 int is_empty_file_      (FILE* html_file);
@@ -375,14 +378,12 @@ void fist_dumb_NOT_USE (const fist_t* const fist, const place_in_code_t call_pla
         DUMB_AND_FPRINTF_("\nCan't dumb_order_arr_ data\n");
     }
 
-    //FIXME other print func
-    if (dumb_order_arr_(fist, fist->next, "next", sizeof(*fist->next), print_count, elem_to_str))
+    if (dumb_order_arr_(fist, fist->next, "next", sizeof(*fist->next), print_count, ind_to_str_))
     {
         DUMB_AND_FPRINTF_("\nCan't dumb_order_arr_ data\n");
     }
 
-    //FIXME other print func
-    if (dumb_order_arr_(fist, fist->prev, "prev", sizeof(*fist->prev), print_count, elem_to_str))
+    if (dumb_order_arr_(fist, fist->prev, "prev", sizeof(*fist->prev), print_count, ind_to_str_))
     {
         DUMB_AND_FPRINTF_("\nCan't dumb_order_arr_ data\n");
     }
@@ -411,18 +412,15 @@ void fist_dumb_NOT_USE (const fist_t* const fist, const place_in_code_t call_pla
     dumb_norder_arr_(fist, fist->data, "data", fist->elem_size,     print_count, elem_to_str, 
                      fist->next[0], fist->next);
 
-    //FIXME other print func
-    dumb_norder_arr_(fist, fist->next, "next", sizeof(*fist->next), print_count, elem_to_str, 
+    dumb_norder_arr_(fist, fist->next, "next", sizeof(*fist->next), print_count, ind_to_str_, 
                      fist->next[0], fist->next);
                      
-    //FIXME other print func
-    dumb_norder_arr_(fist, fist->prev, "prev", sizeof(*fist->prev), print_count, elem_to_str, 
+    dumb_norder_arr_(fist, fist->prev, "prev", sizeof(*fist->prev), print_count, ind_to_str_, 
                      fist->next[0], fist->next);
 
     DUMB_AND_FPRINTF_("\n");   
 
-    //FIXME other print func
-    dumb_norder_arr_(fist, fist->next, "free", sizeof(*fist->next), print_count, elem_to_str, 
+    dumb_norder_arr_(fist, fist->next, "free", sizeof(*fist->next), print_count, ind_to_str_, 
                      fist->free,    fist->next);
 
 
@@ -500,6 +498,22 @@ int data_to_str_(const void* const data, const size_t size, char* const * str,
             perror("Can't stract str and temp_str");
             return -1;
         }
+    }
+
+    return 0;
+}
+
+int ind_to_str_(const void* const data, const size_t size, char* const * str,
+                const size_t str_size)
+{
+    if (is_valid_ptr(data)) return -1;
+    if (is_valid_ptr(str))  return -1;
+    if (!size)              return -1;
+
+    if (snprintf(*str, str_size, "%zu", *(const size_t*)data) <= 0)
+    {
+        perror("Can't snprintf ind_to_str");
+        return -1;
     }
 
     return 0;
@@ -722,7 +736,12 @@ int dumb_arr_elems_norder_(const fist_t* const fist, const void* const arr, cons
     return 0;
 }
 
+#undef LOGG_AND_FPRINTF_
+
 //==========================================================================================
+
+//NOTE - non assertable
+int dot_create_node_(const fist_t* const, const size_t ind, const elem_to_str_t elem_to_str);
 
 int create_fist_dot_(const fist_t* const fist, size_t print_count, 
                      const elem_to_str_t elem_to_str)
@@ -737,66 +756,91 @@ int create_fist_dot_(const fist_t* const fist, size_t print_count,
     fprintf(DUMBER_.dot_file, "digraph {\n"
                               "rankdir=LR;\n");
 
-    fprintf(DUMBER_.dot_file, "node_other [shape=Mrecord; label = \"...\" ];\n");
+    fprintf(DUMBER_.dot_file, "node_other_free [shape=Mrecord; label = \"...\" ];\n");
+    fprintf(DUMBER_.dot_file, "node_other_next_prev [shape=Mrecord; label = \"...\" ];\n");
     fprintf(DUMBER_.dot_file, "node_free  [shape=Mrecord; label = \"FREE\"];\n");
 
-    fprintf(DUMBER_.dot_file, "node_free -> node%-4zu [weight=500; color=black;];\n", fist->free);
-
-    const size_t elem_str_buf_size = 4 * MAX(fist->elem_size, sizeof(*fist->next));
-    char*        elem_str_buf = calloc(1, elem_str_buf_size);
-
-    for (size_t ind = 0; ind < print_count; ++ind)
-    {
-        if (elem_to_str((char*)fist->data + ind * fist->elem_size, fist->elem_size,
-                        &elem_str_buf, elem_str_buf_size))
-        {
-            fprintf(stderr, "\nError elem_to_str\n");
-            free(elem_str_buf); elem_str_buf = NULL;
-            return -1;
-        }
-
-        if (ind == 0)
-        {
-            fprintf(DUMBER_.dot_file, 
-                        "node%-4zu [shape=Mrecord; style=\"filled\"; fillcolor=\"lightgrey\"; "
-                        "label = "
-                        "\" %-4zu | data = %-7s | next = %-7zu | prev = %-7zu \"];\n",
-                    ind, ind, elem_str_buf, fist->next[ind], fist->prev[ind]);
-        }
-        else
-        {
-            fprintf(DUMBER_.dot_file, 
-                        "node%-4zu [shape=Mrecord; label = "
-                        "\" %-4zu | data = %-7s | next = %-7zu | prev = %-7zu \"];\n",
-                    ind, ind, elem_str_buf, fist->next[ind], fist->prev[ind]);
-        }
-
-        if (!memset(elem_str_buf, 0, elem_str_buf_size))
-        {
-            fprintf(stderr, "\nCan't memset elem_str_buf\n");
-            free(elem_str_buf); elem_str_buf = NULL;
-            return -1;
-        }
-    }
-    fprintf(DUMBER_.dot_file, "\n");
-
-    free(elem_str_buf); elem_str_buf = NULL;
-
-
-    for (size_t ind = 0; ind < print_count - 1; ++ind)
-    {
-        fprintf(DUMBER_.dot_file, "node%-4zu -> node%-4zu [weight=1000; color=white; ];\n",
-                ind, ind + 1);
-    }
-    fprintf(DUMBER_.dot_file, "\n");
-
-//--------------------------------------------------------------------------------------
+    fprintf(DUMBER_.dot_file, "node_free -> node%-4zu [weight=1; color=black;];\n", fist->free);
 
     print_count = MIN(print_count, fist->size);
-    size_t cur_ind = fist->next[0];
+    size_t cur_ind = __LONG_LONG_MAX__;
 
-    fprintf(DUMBER_.dot_file, "node%-4zu -> node%-4zu [weight=1; color = red;];\n",
-            0ul, fist->next[0]);
+//-------------------Create base nodes-------------------------------------------------------
+
+    for (size_t ind = 0; ind <= print_count; ++ind)
+    {
+        if (dot_create_node_(fist, ind, elem_to_str))
+            break;
+    }
+    fprintf(DUMBER_.dot_file, "\n");
+
+//--------------------create fist edges---------------------------------------------
+
+
+    const size_t print_count_free = MIN(MAX_PRINT_COUNT, fist->capacity - print_count);
+    size_t*              free_arr = (size_t*)calloc(print_count_free, sizeof(size_t));
+
+    if (!free_arr)
+    {
+        fprintf(stderr, "\nCan't calloc free_arr\n");
+        return -1;
+    }
+
+    if (!memset(free_arr, 1, print_count_free * sizeof(*free_arr)))
+    {
+        fprintf(stderr, "\nCan't memset free arr\n");
+    }
+
+    cur_ind = fist->free;
+    for (size_t deep = 0; 
+                deep < print_count_free && fist->next[cur_ind] != 0; 
+              ++deep,                      cur_ind  = fist->next[cur_ind])
+    {
+        if (cur_ind > fist->capacity)
+        {
+            fprintf(stderr, "\ncur_ind free (%zu) > capacity : (%zu)\n", cur_ind, fist->capacity);
+            break;
+        }
+
+        fprintf(DUMBER_.dot_file, "node%-4zu -> node%-4zu [weight=1; color = gray;];\n",
+                cur_ind, fist->next[cur_ind]);
+
+        free_arr[deep] = cur_ind;
+    }
+    if (fist->next[cur_ind] != 0)
+        fprintf(DUMBER_.dot_file, 
+                "node%-4zu -> node_other_free [weight=1; color = gray;];\n",
+                cur_ind);
+
+//------------------------create base next and prev edges------------------------------------
+
+    for (size_t ind = 0; ind <= print_count; ++ind)
+    {
+        bool is_find_ind_on_free = false;
+        for (size_t free_ind = 0; free_ind < print_count_free; ++free_ind)
+        {
+            if (ind == free_arr[free_ind])
+            {
+                is_find_ind_on_free = true;
+                break;
+            }
+        }
+
+        if (!is_find_ind_on_free)
+        {
+            fprintf(DUMBER_.dot_file, "node%-4zu -> node%-4zu [weight=100; color = red;];\n",
+                    ind, fist->next[ind]);
+
+            fprintf(DUMBER_.dot_file, "node%-4zu -> node%-4zu [weight=100; color = blue;];\n",
+                    ind, fist->prev[ind]);
+        }
+    }
+
+    free(free_arr); free_arr = NULL;
+
+//--------------------------------create next edges-----------------------------------
+
+    cur_ind = fist->next[0];
     for (size_t deep = 0; 
                 deep < print_count && cur_ind != 0; 
               ++deep,                 cur_ind  = fist->next[cur_ind])
@@ -807,15 +851,21 @@ int create_fist_dot_(const fist_t* const fist, size_t print_count,
             break;
         }
 
+        if (cur_ind <= print_count) continue;
+
+        dot_create_node_(fist, cur_ind, elem_to_str);
+
         fprintf(DUMBER_.dot_file, "node%-4zu -> node%-4zu [weight=1; color = red;];\n",
                 cur_ind, fist->next[cur_ind]);
     }
-    if (cur_ind != 0)
-        fprintf(DUMBER_.dot_file, "node%-4zu -> node_other [weight=1; color = red;];\n", cur_ind);
+    if (cur_ind != 0 && cur_ind > print_count)
+        fprintf(DUMBER_.dot_file, 
+                "node%-4zu -> node_other_next_prev [weight=1; color = red;];\n", 
+                cur_ind);
 
 
-    fprintf(DUMBER_.dot_file, "node%-4zu -> node%-4zu [weight=1; color = blue;];\n",
-            0ul, fist->prev[0]);
+//---------------------------------create prev edges---------------------------------------
+
     cur_ind = fist->prev[0];
     for (size_t deep = 0; 
                 deep < print_count && cur_ind != 0; 
@@ -827,35 +877,64 @@ int create_fist_dot_(const fist_t* const fist, size_t print_count,
             break;
         }
 
+        if (cur_ind <= print_count) continue;
+
+        dot_create_node_(fist, cur_ind, elem_to_str);
+
         fprintf(DUMBER_.dot_file, "node%-4zu -> node%-4zu [weight=1; color = blue;];\n",
                 cur_ind, fist->prev[cur_ind]);
     }
-    if (cur_ind != 0)
-        fprintf(DUMBER_.dot_file, "node%-4zu -> node_other [weight=1; color = blue;];\n", cur_ind);
-
-
-    print_count = MIN(MAX_PRINT_COUNT, fist->capacity - print_count);
-
-    cur_ind = fist->free;
-    for (size_t deep = 0; 
-                deep < print_count && cur_ind != 0; 
-              ++deep,                 cur_ind  = fist->next[cur_ind])
-    {
-        if (cur_ind > fist->capacity)
-        {
-            fprintf(stderr, "\ncur_ind free (%zu) > capacity : (%zu)\n", cur_ind, fist->capacity);
-            break;
-        }
-
-    
-        fprintf(DUMBER_.dot_file, "node%-4zu -> node%-4zu [weight=1; color = gray;];\n",
-                cur_ind, fist->next[cur_ind]);
-    }
-    if (cur_ind != 0)
-        fprintf(DUMBER_.dot_file, "node%-4zu -> node_other [weight=1; color = gray;];\n", cur_ind);
+    if (cur_ind != 0 && cur_ind > print_count)
+        fprintf(DUMBER_.dot_file, 
+                "node%-4zu -> node_other_next_prev [weight=1; color = blue;];\n",
+                cur_ind);
 
 
     fprintf(DUMBER_.dot_file, "}");
+
+    return 0;
+}
+
+int dot_create_node_(const fist_t* const fist, const size_t ind, const elem_to_str_t elem_to_str)
+{
+    if (is_valid_ptr(fist))         return -1;
+    if (is_valid_ptr(elem_to_str))  return -1;
+
+    const size_t elem_str_buf_size = 4 * MAX(fist->elem_size, sizeof(*fist->next));
+    char*        elem_str_buf = calloc(1, elem_str_buf_size);
+
+    if (elem_to_str((char*)fist->data + ind * fist->elem_size, fist->elem_size,
+                        &elem_str_buf, elem_str_buf_size))
+        {
+            fprintf(stderr, "\nError elem_to_str\n");
+            free(elem_str_buf); elem_str_buf = NULL;
+            return -1;
+        }
+
+    if (ind == 0)
+    {
+        fprintf(DUMBER_.dot_file, 
+                    "node%-4zu [shape=Mrecord; style=\"filled\"; fillcolor=\"lightgrey\"; "
+                    "label = "
+                    "\" %-4zu | data = %-7s | next = %-7zu | prev = %-7zu \"];\n",
+                ind, ind, elem_str_buf, fist->next[ind], fist->prev[ind]);
+    }
+    else
+    {
+        fprintf(DUMBER_.dot_file, 
+                    "node%-4zu [shape=Mrecord; label = "
+                    "\" %-4zu | data = %-7s | next = %-7zu | prev = %-7zu \"];\n",
+                ind, ind, elem_str_buf, fist->next[ind], fist->prev[ind]);
+    }
+
+    if (!memset(elem_str_buf, 0, elem_str_buf_size))
+    {
+        fprintf(stderr, "\nCan't memset elem_str_buf\n");
+        free(elem_str_buf); elem_str_buf = NULL;
+        return -1;
+    }
+
+    free(elem_str_buf); elem_str_buf = NULL;
     return 0;
 }
 
@@ -910,7 +989,3 @@ int insert_fist_png_(void)
 
     return 0;
 }
-
-//==========================================================================================
-
-#undef LOGG_AND_FPRINTF_

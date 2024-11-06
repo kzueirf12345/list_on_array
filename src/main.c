@@ -27,18 +27,34 @@ int main()
     size_t add_elem_fix = 5;
     FIST_ERROR_HANDLE(fist_push(&fist, 0, &add_elem_fix), 
                                                      logger_dtor(); dumb_dtor(); fist_dtor(&fist););
-    for (size_t add_elem = 10; add_elem < 1500; add_elem += 10)
+    for (size_t add_elem = 10; add_elem < 150; add_elem += 10)
     {
         FIST_ERROR_HANDLE(fist_push(&fist, add_elem/10, &add_elem), 
                                                      logger_dtor(); dumb_dtor(); fist_dtor(&fist););
-    }
+    } 
+    FIST_ERROR_HANDLE(fist_pop  (&fist, 1),          logger_dtor(); dumb_dtor(); fist_dtor(&fist););
+    FIST_DUMB(&fist, NULL);
+    FIST_ERROR_HANDLE(fist_pop  (&fist, 12),         logger_dtor(); dumb_dtor(); fist_dtor(&fist););
+    FIST_DUMB(&fist, NULL);
+    FIST_ERROR_HANDLE(fist_pop  (&fist, 6),          logger_dtor(); dumb_dtor(); fist_dtor(&fist););
+    FIST_DUMB(&fist, NULL);
+    FIST_ERROR_HANDLE(fist_pop  (&fist, 3),          logger_dtor(); dumb_dtor(); fist_dtor(&fist););
+    FIST_DUMB(&fist, NULL);
+    FIST_ERROR_HANDLE(fist_pop  (&fist, 15),         logger_dtor(); dumb_dtor(); fist_dtor(&fist););
+    FIST_DUMB(&fist, NULL);
+    FIST_ERROR_HANDLE(fist_pop  (&fist, 10),         logger_dtor(); dumb_dtor(); fist_dtor(&fist););
+    FIST_DUMB(&fist, NULL);
+    FIST_ERROR_HANDLE(fist_pop  (&fist, 9),          logger_dtor(); dumb_dtor(); fist_dtor(&fist););
+    FIST_DUMB(&fist, NULL);
+    FIST_ERROR_HANDLE(fist_pop  (&fist, 8),          logger_dtor(); dumb_dtor(); fist_dtor(&fist););
+    FIST_DUMB(&fist, NULL);
 
-    for (size_t i = 10; i > 0; --i)
-    {
-        const size_t num = i;
-        FIST_ERROR_HANDLE(fist_pop  (&fist, num),    logger_dtor(); dumb_dtor(); fist_dtor(&fist););
-        FIST_DUMB(&fist, NULL);
-    }
+    // for (size_t i = 10; i > 0; --i)
+    // {
+    //     const size_t num = i;
+    //     FIST_ERROR_HANDLE(fist_pop  (&fist, num),    logger_dtor(); dumb_dtor(); fist_dtor(&fist););
+    //     FIST_DUMB(&fist, NULL);
+    // }
 
 
     fist_dtor(&fist);
