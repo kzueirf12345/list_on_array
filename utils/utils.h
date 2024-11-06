@@ -14,6 +14,8 @@
 #define IF_ELSE_DEBUG(smth, other_smth) other_smth
 #endif /*NDEBUG*/
 
+#define SMTH_NAME_TO_STRING(smth) #smth;
+
 #define FIST_INOUT_ELEM_CODE "%zu"
 
 #endif /*LIST_ON_ARRAY_UTILS_H*/

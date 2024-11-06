@@ -33,7 +33,7 @@ int main()
                                                      logger_dtor(); dumb_dtor(); fist_dtor(&fist););
     }
 
-    for (size_t i = 100; i > 0; --i)
+    for (size_t i = 10; i > 0; --i)
     {
         const size_t num = i;
         FIST_ERROR_HANDLE(fist_pop  (&fist, num),    logger_dtor(); dumb_dtor(); fist_dtor(&fist););

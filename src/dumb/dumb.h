@@ -31,15 +31,16 @@ const char* dumb_strerror(const enum DumbError error);
 enum DumbError dumb_ctor(void);
 enum DumbError dumb_dtor(void);
 
-enum DumbError dumb_set_out_html_file       (const char* const filename);
-enum DumbError dumb_set_out_dot_file        (const char* const filename);
-enum DumbError dumb_set_out_png_file        (const char* const filename);
-enum DumbError dumb_set_out_graph_count_file(const char* const filename);
+enum DumbError dumb_set_out_html_file           (const char* const filename);
+enum DumbError dumb_set_out_dot_file            (const char* const filename);
+enum DumbError dumb_set_out_png_file            (const char* const filename);
+enum DumbError dumb_set_out_graph_count_file    (const char* const filename);
+
+typedef int (*elem_to_str_t) (const void* const elem, const size_t   elem_size,
+                              char* const *     str,  const size_t mx_str_size);
 
 void fist_dumb_NOT_USE (const fist_t* const fist, const place_in_code_t call_place, 
-                        int (*elem_to_str)
-                            (const void* const elem, const size_t   elem_size,
-                             char* const *     str,  const size_t mx_str_size));
+                        elem_to_str_t elem_to_str);
 
 #define FIST_DUMB(fist, elem_to_str)                                                                \
         fist_dumb_NOT_USE(fist,                                                                     \
