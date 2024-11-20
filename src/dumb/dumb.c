@@ -251,7 +251,7 @@ enum DumbError dumb_set_out_graph_count_file(const char* const filename)
 
 //==========================================================================================
 
-static const size_t MAX_PRINT_COUNT = 7;
+// static const size_t MAX_PRINT_COUNT = 1000;
 
 //NOTE - non assertable
 int data_to_str_        (const void* const data, const size_t size, char* const * str,
@@ -359,7 +359,7 @@ void fist_dumb_NOT_USE (const fist_t* const fist, const place_in_code_t call_pla
     for (size_t i = 0; i < SKIP_SIZE; ++i)
         DUMB_AND_FPRINTF_(" ");
 
-    size_t print_count = MIN(fist->capacity + 1, MAX_PRINT_COUNT);
+    size_t print_count = fist->capacity + 1;
     const size_t print_count_graph = print_count;
 
     for (size_t ind = 0; ind < print_count; ++ind)
@@ -396,7 +396,7 @@ void fist_dumb_NOT_USE (const fist_t* const fist, const place_in_code_t call_pla
         DUMB_AND_FPRINTF_(" ");
 
            print_count      = MIN(print_count,     fist->size);
-    size_t print_count_free = MIN(MAX_PRINT_COUNT, fist->capacity - print_count);
+    size_t print_count_free = fist->capacity - print_count;
 
     for (size_t ind = 1; ind < MAX(print_count, print_count_free) + 1; ++ind)
     {
@@ -777,7 +777,7 @@ int create_fist_dot_(const fist_t* const fist, size_t print_count,
 //--------------------create fist edges---------------------------------------------
 
 
-    const size_t print_count_free = MIN(MAX_PRINT_COUNT, fist->capacity - print_count);
+    const size_t print_count_free = fist->capacity - print_count;
     size_t*              free_arr = (size_t*)calloc(print_count_free, sizeof(size_t));
 
     if (!free_arr)

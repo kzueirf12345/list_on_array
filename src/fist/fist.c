@@ -119,14 +119,13 @@ enum FistError fist_pop (fist_t* const fist, const size_t del_ind)
     return FIST_ERROR_SUCCESS;
 }
 
-//------------------------------------- //TODO linearize
+//-------------------------------------
 
 static enum FistError fist_resize_arr_(void** arr,                const size_t elem_size,
                                        const size_t old_capacity, const size_t new_capacity);
 
 static enum FistError fist_resize_(fist_t* const fist)
 {
-    //TODO down resize
     FIST_VERIFY(fist, NULL);
 
     size_t new_capacity = 0;
@@ -251,7 +250,7 @@ enum FistError fist_linearize(fist_t* const fist, size_t new_capacity)
     {
         fist->next[ind] = ind + 1;
     }
-    fist->next[new_capacity] = 0;
+    fist->next[fist->size] = 0;
 
     //prev
 
@@ -263,7 +262,7 @@ enum FistError fist_linearize(fist_t* const fist, size_t new_capacity)
         fist->prev[ind + 1] = ind;
     }
     memset((char*)fist->prev + (fist->size + 1) * sizeof(*fist->prev), 0, new_capacity - fist->size);
-    fist->prev[0] = fist->size + 1;
+    fist->prev[0] = fist->size;
 
     //other
 
