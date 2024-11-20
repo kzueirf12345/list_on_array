@@ -49,6 +49,9 @@ int main()
     FIST_ERROR_HANDLE(fist_pop  (&fist, 8),          logger_dtor(); dumb_dtor(); fist_dtor(&fist););
     FIST_DUMB(&fist, NULL);
 
+    FIST_ERROR_HANDLE(fist_linearize(&fist, 0),      logger_dtor(); dumb_dtor(); fist_dtor(&fist););
+    FIST_DUMB(&fist, NULL);
+
     // for (size_t i = 10; i > 0; --i)
     // {
     //     const size_t num = i;

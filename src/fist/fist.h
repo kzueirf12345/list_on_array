@@ -27,8 +27,9 @@ enum FistError fist_ctor_NOT_USE(fist_t* const fist, const size_t elem_size, con
 
 void fist_dtor(fist_t* const fist);
 
-enum FistError fist_push(fist_t* const fist, const size_t prev_ind, const void* const add_elem);
-enum FistError fist_pop (fist_t* const fist, const size_t del_ind);
+enum FistError fist_push     (fist_t* const fist, const size_t prev_ind, const void* const add_elem);
+enum FistError fist_pop      (fist_t* const fist, const size_t del_ind);
+enum FistError fist_linearize(fist_t* const fist, size_t new_capacity);
 
 enum FistError fist_print(FILE* out, const fist_t* const fist);
 

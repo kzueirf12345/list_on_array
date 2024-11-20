@@ -83,7 +83,7 @@ enum DumbError dumb_ctor(void)
         return DUMB_ERROR_FAILURE;
     }
 
-    DUMBER_.png_name = "./log/dumb.png";
+    DUMBER_.png_name = "./log/dumb.png"; // TODO remove .png, num after count
 
     DUMBER_.graph_count_name = "./log/graph_count.txt";
 
@@ -127,7 +127,7 @@ enum DumbError set_graph_count_(void) //NOTE - non assertable
 {
     is_set_graph_count_ = true;
 
-    if (access(DUMBER_.graph_count_name, F_OK))
+    if (access(DUMBER_.graph_count_name, F_OK)) //TODO switch to handle fopen errno
     {
         errno = 0;
         DUMBER_.graph_count = 0;
@@ -279,9 +279,6 @@ int dumb_norder_arr_(const fist_t* const fist,
                      const size_t print_count, const elem_to_str_t elem_to_str,
                      const size_t start_ind, const size_t* const ind_arr);
 
-//NOTE - non assertable
-int dumb_norder_all_(const fist_t* const fist, const size_t print_count);
-
 
 //NOTE - non assertable
 int create_fist_dot_    (const fist_t* const fist, size_t print_count, 
@@ -313,7 +310,7 @@ void fist_dumb_NOT_USE (const fist_t* const fist, const place_in_code_t call_pla
 
     DUMB_AND_FPRINTF_("\n==FIST DUMB==\nDate: %s\nTime: %s\n\n", __DATE__, __TIME__);
 
-    const char* stack_buf = handle_invalid_ptr_(fist);
+    const char* fist_buf  = handle_invalid_ptr_(fist);
     const char* file_buf  = handle_invalid_ptr_(call_place.file);
     const char* func_buf  = handle_invalid_ptr_(call_place.func);
     file_buf =  file_buf  ? file_buf :          call_place.file;
@@ -322,9 +319,9 @@ void fist_dumb_NOT_USE (const fist_t* const fist, const place_in_code_t call_pla
                                                 ? CODE_LINE_POISON
                                                 : call_place.line;
 
-    if (stack_buf)
+    if (fist_buf)
     {
-        DUMB_AND_FPRINTF_("fist_t [%s] at %s:%d (%s())\n", stack_buf, file_buf, line_buf, func_buf);
+        DUMB_AND_FPRINTF_("fist_t [%s] at %s:%d (%s())\n", fist_buf, file_buf, line_buf, func_buf);
         fprintf(stderr, "\n");
         return;
     }
@@ -566,9 +563,12 @@ static const char* handle_invalid_ptr_(const void* const check_ptr)
 }
 
 //==========================================================================================
+//TODO split file graph and normal
+//TODO rename physical and logical order
+//TODO struct for group func parametrs
 
 //NOTE - non assertable
-int dumb_arr_elems_order_(const fist_t* const fist, const void* const arr, const size_t elem_size, 
+int dumb_order_arr_elems_(const fist_t* const fist, const void* const arr, const size_t elem_size, 
                           const size_t print_count, const elem_to_str_t elem_to_str);
 
 int dumb_order_arr_(const fist_t* const fist, 
@@ -591,7 +591,7 @@ int dumb_order_arr_(const fist_t* const fist,
 
         DUMB_AND_FPRINTF_("\t%s[%-10p] ORDER:\t", arr_name, arr);
 
-        if (dumb_arr_elems_order_(fist, arr, elem_size, print_count, elem_to_str))
+        if (dumb_order_arr_elems_(fist, arr, elem_size, print_count, elem_to_str))
         {
             DUMB_AND_FPRINTF_("\nCan't print %s elems\n", arr_name);
             return -1;
@@ -603,7 +603,7 @@ int dumb_order_arr_(const fist_t* const fist,
     return 0;
 }
 
-int dumb_arr_elems_order_(const fist_t* const fist, const void* const arr, const size_t elem_size, 
+int dumb_order_arr_elems_(const fist_t* const fist, const void* const arr, const size_t elem_size, 
                           const size_t print_count, const elem_to_str_t elem_to_str)
 {
     if (is_valid_ptr(fist))         return -1;
@@ -644,7 +644,7 @@ int dumb_arr_elems_order_(const fist_t* const fist, const void* const arr, const
 }
 
 //NOTE - non assertable
-int dumb_arr_elems_norder_(const fist_t* const fist, const void* const arr, const size_t elem_size, 
+int dumb_norder_arr_elems_(const fist_t* const fist, const void* const arr, const size_t elem_size, 
                            const size_t print_count, const elem_to_str_t elem_to_str,
                            const size_t start_ind, const size_t* const ind_arr);
 
@@ -670,7 +670,7 @@ int dumb_norder_arr_(const fist_t* const fist,
 
         DUMB_AND_FPRINTF_("\t%s[%p]:\t", arr_name, arr);
 
-        if (dumb_arr_elems_norder_(fist, arr, elem_size, print_count, elem_to_str, start_ind, 
+        if (dumb_norder_arr_elems_(fist, arr, elem_size, print_count, elem_to_str, start_ind, 
                                    ind_arr))
         {
             DUMB_AND_FPRINTF_("\nCan't print %s elems\n", arr_name);
@@ -683,7 +683,7 @@ int dumb_norder_arr_(const fist_t* const fist,
     return 0;
 }
 
-int dumb_arr_elems_norder_(const fist_t* const fist, const void* const arr, const size_t elem_size, 
+int dumb_norder_arr_elems_(const fist_t* const fist, const void* const arr, const size_t elem_size, 
                            const size_t print_count, const elem_to_str_t elem_to_str,
                            const size_t start_ind, const size_t* const ind_arr)
 {
@@ -812,6 +812,7 @@ int create_fist_dot_(const fist_t* const fist, size_t print_count,
                 "node%-4zu -> node_other_free [weight=1; color = gray;];\n",
                 cur_ind);
 
+// TODO is_free
 //------------------------create base next and prev edges------------------------------------
 
     for (size_t ind = 0; ind <= print_count; ++ind)

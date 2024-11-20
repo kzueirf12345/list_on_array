@@ -119,7 +119,7 @@ enum FistError fist_pop (fist_t* const fist, const size_t del_ind)
     return FIST_ERROR_SUCCESS;
 }
 
-//-------------------------------------
+//------------------------------------- //TODO linearize
 
 static enum FistError fist_resize_arr_(void** arr,                const size_t elem_size,
                                        const size_t old_capacity, const size_t new_capacity);
@@ -214,6 +214,64 @@ static void* recalloc_(void* ptrmem, const size_t old_number, const size_t old_s
     }
 
     return ptrmem;
+}
+
+enum FistError fist_linearize(fist_t* const fist, size_t new_capacity)
+{
+    FIST_VERIFY(fist, NULL);
+    
+    if (new_capacity == 0) new_capacity = fist->capacity;
+
+    //data
+
+    void* temp_arr = calloc(new_capacity + 1, fist->elem_size);
+    if ( !temp_arr)
+    {
+        perror("Can't calloc temp_arr");
+        return FIST_ERROR_STANDARD_ERRNO;
+    }
+
+    for (size_t ind_new = 1, ind_old = fist->next[0]; 
+         ind_new <= fist->size; 
+         ++ind_new, ind_old = fist->next[ind_old])
+    {
+        memcpy((char*)temp_arr + ind_new * fist->elem_size, 
+               (char*)fist->data + ind_old * fist->elem_size,
+               fist->elem_size);
+    }
+    free(fist->data);
+    fist->data = temp_arr;
+
+    //next
+
+    FIST_ERROR_HANDLE(fist_resize_arr_((void**)&fist->next, fist->elem_size,
+                                       fist->capacity + 1, new_capacity + 1));
+
+    for (size_t ind = 0; ind < new_capacity; ++ind)
+    {
+        fist->next[ind] = ind + 1;
+    }
+    fist->next[new_capacity] = 0;
+
+    //prev
+
+    FIST_ERROR_HANDLE(fist_resize_arr_((void**)&fist->prev, fist->elem_size, 
+                                       fist->capacity + 1, new_capacity + 1));
+
+    for (size_t ind = 1; ind < fist->size; ++ind)
+    {
+        fist->prev[ind + 1] = ind;
+    }
+    memset((char*)fist->prev + (fist->size + 1) * sizeof(*fist->prev), 0, new_capacity - fist->size);
+    fist->prev[0] = fist->size + 1;
+
+    //other
+
+    fist->free     = fist->size + 1;
+    fist->capacity = new_capacity;
+
+    FIST_VERIFY(fist, NULL);
+    return FIST_ERROR_SUCCESS;
 }
 
 //-------------------------------------
