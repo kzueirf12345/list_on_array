@@ -15,7 +15,7 @@ int main()
     DUMB_ERROR_HANDLE(dumb_ctor(),                                     logger_dtor(); dumb_dtor(););
     DUMB_ERROR_HANDLE(dumb_set_out_html_file("./log/dumb.html"),       logger_dtor(); dumb_dtor(););
     DUMB_ERROR_HANDLE(dumb_set_out_dot_file ("./log/dumb.dot"),        logger_dtor(); dumb_dtor(););
-    DUMB_ERROR_HANDLE(dumb_set_out_png_file ("./log/dumb.png"),        logger_dtor(); dumb_dtor(););
+    DUMB_ERROR_HANDLE(dumb_set_out_png_file ("./log/dumb"),            logger_dtor(); dumb_dtor(););
 
     //====================
 

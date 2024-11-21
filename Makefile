@@ -48,7 +48,8 @@ FLAGS += $(ADD_FLAGS)
 DIRS = fist verification dumb verify_utils
 BUILD_DIRS = $(DIRS:%=$(BUILD_DIR)/%)
 
-SOURCES = main.c fist/fist.c verification/verification.c dumb/dumb.c verify_utils/verify_utils.c
+SOURCES = main.c fist/fist.c verification/verification.c dumb/dumb.c verify_utils/verify_utils.c \
+		  dumb/dumber.c dumb/utils.c dumb/dumb_text.c dumb/dumb_graphical.c
 
 SOURCES_REL_PATH = $(SOURCES:%=$(SRC_DIR)/%)
 OBJECTS_REL_PATH = $(SOURCES:%.c=$(BUILD_DIR)/%.o)
