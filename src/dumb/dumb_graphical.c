@@ -3,18 +3,18 @@
 #include "dumb_graphical.h"
 #include "dumber.h"
 #include "../verify_utils/verify_utils.h"
-#include "utils.h"
+#include "utils/utils.h"
 
 //NOTE - non assertable
 int dot_create_node_(const fist_t* const, const size_t ind, const elem_to_str_t elem_to_str);
 
 int create_fist_dot(const fist_t* const fist, const elem_to_str_t elem_to_str)
 {
-    if (is_valid_ptr(fist))          return -1;
-    if (is_valid_ptr(elem_to_str))   return -1;
-    if (is_valid_ptr(fist->data))    return -1;
-    if (is_valid_ptr(fist->next))    return -1;
-    if (is_valid_ptr(fist->prev))    return -1;
+    if (fist_is_valid_ptr(fist))          return -1;
+    if (fist_is_valid_ptr(elem_to_str))   return -1;
+    if (fist_is_valid_ptr(fist->data))    return -1;
+    if (fist_is_valid_ptr(fist->next))    return -1;
+    if (fist_is_valid_ptr(fist->prev))    return -1;
 
     fprintf((*DUMBER_get_dot_file()), "digraph {\n"
                               "rankdir=LR;\n");
@@ -160,8 +160,8 @@ int create_fist_dot(const fist_t* const fist, const elem_to_str_t elem_to_str)
 
 int dot_create_node_(const fist_t* const fist, const size_t ind, const elem_to_str_t elem_to_str)
 {
-    if (is_valid_ptr(fist))         return -1;
-    if (is_valid_ptr(elem_to_str))  return -1;
+    if (fist_is_valid_ptr(fist))         return -1;
+    if (fist_is_valid_ptr(elem_to_str))  return -1;
 
     const size_t elem_str_buf_size = 4 * MAX(fist->elem_size, sizeof(*fist->next));
     char*        elem_str_buf = calloc(1, elem_str_buf_size);

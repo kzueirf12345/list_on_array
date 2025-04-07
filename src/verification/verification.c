@@ -50,7 +50,7 @@ const char* fist_strerror(const enum FistError error) {
 #ifndef NDEBUG
 
 enum FistError fist_verify_NOT_USE(const fist_t* const fist) {
-    switch (is_valid_ptr(fist)) {
+    switch (fist_is_valid_ptr(fist)) {
         case PTR_STATES_VALID:
             break;
         case PTR_STATES_NULL:
@@ -65,7 +65,7 @@ enum FistError fist_verify_NOT_USE(const fist_t* const fist) {
             return FIST_ERROR_UNKNOWN;
     }
 
-    switch (is_valid_ptr(fist->data)) {
+    switch (fist_is_valid_ptr(fist->data)) {
         case PTR_STATES_VALID:
             break;
         case PTR_STATES_NULL:
@@ -80,7 +80,7 @@ enum FistError fist_verify_NOT_USE(const fist_t* const fist) {
             return FIST_ERROR_UNKNOWN;
     }
 
-    switch (is_valid_ptr(fist->next)) {
+    switch (fist_is_valid_ptr(fist->next)) {
         case PTR_STATES_VALID:
             break;
         case PTR_STATES_NULL:
@@ -95,7 +95,7 @@ enum FistError fist_verify_NOT_USE(const fist_t* const fist) {
             return FIST_ERROR_UNKNOWN;
     }
 
-    switch (is_valid_ptr(fist->prev)) {
+    switch (fist_is_valid_ptr(fist->prev)) {
         case PTR_STATES_VALID:
             break;
         case PTR_STATES_NULL:

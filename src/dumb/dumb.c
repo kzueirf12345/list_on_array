@@ -7,7 +7,7 @@
 #include "dumb.h"
 #include "../fist/fist.h"
 #include "logger/liblogger.h"
-#include "utils.h"
+#include "utils/utils.h"
 #include "../verify_utils/verify_utils.h"
 #include "dumber.h"
 #include "utils.h"
@@ -53,18 +53,18 @@ const char* dumb_strerror(const enum DumbError error)
 void fist_dumb_NOT_USE (const fist_t* const fist, const place_in_code_t call_place, 
                         elem_to_str_t elem_to_str)
 {
-    if (!elem_to_str) elem_to_str = data_to_str;
+    if (!elem_to_str) elem_to_str = fist_data_to_str;
 
-    if (is_empty_file((*DUMBER_get_html_file())) <= 0) 
+    if (fist_is_empty_file((*DUMBER_get_html_file())) <= 0) 
         fprintf((*DUMBER_get_html_file()), HTML_INTRO_);
 
     fprintf((*DUMBER_get_html_file()), "</pre><hr /><pre>\n");   
 
     DUMB_AND_FPRINTF_("\n==FIST DUMB==\nDate: %s\nTime: %s\n\n", __DATE__, __TIME__);
 
-    const char* fist_buf  = handle_invalid_ptr(fist);
-    const char* file_buf  = handle_invalid_ptr(call_place.file);
-    const char* func_buf  = handle_invalid_ptr(call_place.func);
+    const char* fist_buf  = fist_handle_invalid_ptr(fist);
+    const char* file_buf  = fist_handle_invalid_ptr(call_place.file);
+    const char* func_buf  = fist_handle_invalid_ptr(call_place.func);
     file_buf =  file_buf  ? file_buf :          call_place.file;
     func_buf =  func_buf  ? func_buf :          call_place.func;
     const int   line_buf  =                     call_place.line <= 0
@@ -78,9 +78,9 @@ void fist_dumb_NOT_USE (const fist_t* const fist, const place_in_code_t call_pla
         return;
     }
 
-    const char*           fist_name_buf      = handle_invalid_ptr( fist->name           );
-    const char*           fist_file_burn_buf = handle_invalid_ptr( fist->burn_place.file);
-    const char*           fist_func_burn_buf = handle_invalid_ptr( fist->burn_place.func);
+    const char*           fist_name_buf      = fist_handle_invalid_ptr( fist->name           );
+    const char*           fist_file_burn_buf = fist_handle_invalid_ptr( fist->burn_place.file);
+    const char*           fist_func_burn_buf = fist_handle_invalid_ptr( fist->burn_place.func);
     fist_name_buf       = fist_name_buf      ? fist_name_buf      : fist->name;
     fist_file_burn_buf  = fist_file_burn_buf ? fist_file_burn_buf : fist->burn_place.file;
     fist_func_burn_buf  = fist_func_burn_buf ? fist_func_burn_buf : fist->burn_place.func;
@@ -124,12 +124,12 @@ void fist_dumb_NOT_USE (const fist_t* const fist, const place_in_code_t call_pla
         DUMB_AND_FPRINTF_("\nCan't dumb_physical_arr data\n");
     }
 
-    if (dumb_physical_arr(fist, fist->next, "next", sizeof(*fist->next), ind_to_str))
+    if (dumb_physical_arr(fist, fist->next, "next", sizeof(*fist->next), fist_ind_to_str))
     {
         DUMB_AND_FPRINTF_("\nCan't dumb_physical_arr data\n");
     }
 
-    if (dumb_physical_arr(fist, fist->prev, "prev", sizeof(*fist->prev), ind_to_str))
+    if (dumb_physical_arr(fist, fist->prev, "prev", sizeof(*fist->prev), fist_ind_to_str))
     {
         DUMB_AND_FPRINTF_("\nCan't dumb_physical_arr data\n");
     }
@@ -155,15 +155,15 @@ void fist_dumb_NOT_USE (const fist_t* const fist, const place_in_code_t call_pla
     dumb_logical_arr(fist, fist->data, "data", fist->elem_size, elem_to_str, 
                      fist->next[0], fist->next);
 
-    dumb_logical_arr(fist, fist->next, "next", sizeof(*fist->next), ind_to_str, 
+    dumb_logical_arr(fist, fist->next, "next", sizeof(*fist->next), fist_ind_to_str, 
                      fist->next[0], fist->next);
                      
-    dumb_logical_arr(fist, fist->prev, "prev", sizeof(*fist->prev), ind_to_str, 
+    dumb_logical_arr(fist, fist->prev, "prev", sizeof(*fist->prev), fist_ind_to_str, 
                      fist->next[0], fist->next);
 
     DUMB_AND_FPRINTF_("\n");   
 
-    dumb_logical_arr(fist, fist->next, "free", sizeof(*fist->next), ind_to_str, 
+    dumb_logical_arr(fist, fist->next, "free", sizeof(*fist->next), fist_ind_to_str, 
                      fist->free,    fist->next);
 
 

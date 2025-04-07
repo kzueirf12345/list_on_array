@@ -3,17 +3,17 @@
 
 #include "utils.h"
 #include "../verify_utils/verify_utils.h"
-#include "../../utils/utils.h"
+#include "utils/utils.h"
 
 #ifndef FIST_INOUT_ELEM_CODE
 #define FIST_INOUT_ELEM_CODE "%lX"
 #endif /*FIST_INOUT_ELEM_CODE*/
 
-int data_to_str(const void* const data, const size_t size, char* const * str,
+int fist_data_to_str(const void* const data, const size_t size, char* const * str,
                    const size_t str_size)
 {
-    if (is_valid_ptr(data)) return -1;
-    if (is_valid_ptr(str))  return -1;
+    if (fist_is_valid_ptr(data)) return -1;
+    if (fist_is_valid_ptr(str))  return -1;
     if (!size)              return -1;
     
     char temp_str[sizeof(uint64_t) * 4] = {};
@@ -49,25 +49,25 @@ int data_to_str(const void* const data, const size_t size, char* const * str,
     return 0;
 }
 
-int ind_to_str(const void* const data, const size_t size, char* const * str,
+int fist_ind_to_str(const void* const data, const size_t size, char* const * str,
                 const size_t str_size)
 {
-    if (is_valid_ptr(data)) return -1;
-    if (is_valid_ptr(str))  return -1;
+    if (fist_is_valid_ptr(data)) return -1;
+    if (fist_is_valid_ptr(str))  return -1;
     if (!size)              return -1;
 
     if (snprintf(*str, str_size, "%zu", *(const size_t*)data) <= 0)
     {
-        perror("Can't snprintf ind_to_str");
+        perror("Can't snprintf fist_ind_to_str");
         return -1;
     }
 
     return 0;
 }
 
-int is_empty_file(FILE* file)
+int fist_is_empty_file(FILE* file)
 {
-    if (is_valid_ptr(file))
+    if (fist_is_valid_ptr(file))
     {
         fprintf(stderr, "Is empty file nvalid\n");
         return -1;
@@ -92,9 +92,9 @@ int is_empty_file(FILE* file)
     return res;
 }
 
-const char* handle_invalid_ptr(const void* const check_ptr)
+const char* fist_handle_invalid_ptr(const void* const check_ptr)
 {
-    switch (is_valid_ptr(check_ptr))
+    switch (fist_is_valid_ptr(check_ptr))
     {
     case PTR_STATES_VALID:
         return NULL;

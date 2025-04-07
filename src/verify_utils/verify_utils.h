@@ -12,6 +12,6 @@ enum PtrState
 };
 static_assert(PTR_STATES_VALID == 0);
 
-enum PtrState is_valid_ptr(const void* const ptr);
+enum PtrState fist_is_valid_ptr(const void* const ptr);
 
 #endif /*LIST_ON_ARRAY_SRC_VERIFY_UTILS_VERIFY_UTILS_H*/

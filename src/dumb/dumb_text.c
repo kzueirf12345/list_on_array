@@ -21,9 +21,9 @@ int dumb_physical_arr(const fist_t* const fist,
                       const void* const arr, const char* const arr_name, const size_t elem_size,
                       const elem_to_str_t elem_to_str)
 {
-    if (is_valid_ptr(arr_name)) return -1;
+    if (fist_is_valid_ptr(arr_name)) return -1;
 
-    const char* fist_arr_buf = handle_invalid_ptr(arr);
+    const char* fist_arr_buf = fist_handle_invalid_ptr(arr);
     if (fist_arr_buf)
     {
         DUMB_AND_FPRINTF_("\t%s[%s]\n", arr_name, fist_arr_buf);
@@ -31,8 +31,8 @@ int dumb_physical_arr(const fist_t* const fist,
     }
     else
     {
-        if (is_valid_ptr(fist))          return -1;
-        if (is_valid_ptr(elem_to_str))   return -1;
+        if (fist_is_valid_ptr(fist))          return -1;
+        if (fist_is_valid_ptr(elem_to_str))   return -1;
         if (!elem_size)                  return -1;
 
         DUMB_AND_FPRINTF_("\t%s[%-10p] ORDER:\t", arr_name, arr);
@@ -52,9 +52,9 @@ int dumb_physical_arr(const fist_t* const fist,
 int dumb_physical_arr_elems_(const fist_t* const fist, const void* const arr, const size_t elem_size, 
                              const elem_to_str_t elem_to_str)
 {
-    if (is_valid_ptr(fist))         return -1;
-    if (is_valid_ptr(arr))          return -1;
-    if (is_valid_ptr(elem_to_str))  return -1;
+    if (fist_is_valid_ptr(fist))         return -1;
+    if (fist_is_valid_ptr(arr))          return -1;
+    if (fist_is_valid_ptr(elem_to_str))  return -1;
     if (!elem_size)                 return -1;
 
     const size_t elem_str_buf_size = 4 * elem_size;
@@ -99,9 +99,9 @@ int dumb_logical_arr(const fist_t* const fist,
                      const elem_to_str_t elem_to_str,
                      const size_t start_ind, const size_t* const ind_arr)
 {
-    if (is_valid_ptr(arr_name)) return -1;
+    if (fist_is_valid_ptr(arr_name)) return -1;
 
-    const char* const fist_arr_buf = handle_invalid_ptr(arr);
+    const char* const fist_arr_buf = fist_handle_invalid_ptr(arr);
     if (fist_arr_buf)
     {
         DUMB_AND_FPRINTF_("\t%s[%s]\n", arr_name, fist_arr_buf);
@@ -109,9 +109,9 @@ int dumb_logical_arr(const fist_t* const fist,
     }
     else
     {
-        if (is_valid_ptr(fist))         return -1;
-        if (is_valid_ptr(elem_to_str))  return -1;
-        if (is_valid_ptr(ind_arr))      return -1;
+        if (fist_is_valid_ptr(fist))         return -1;
+        if (fist_is_valid_ptr(elem_to_str))  return -1;
+        if (fist_is_valid_ptr(ind_arr))      return -1;
         if (!elem_size)                 return -1;
 
         DUMB_AND_FPRINTF_("\t%s[%p]:\t", arr_name, arr);
@@ -132,10 +132,10 @@ int dumb_logical_arr_elems_(const fist_t* const fist, const void* const arr, con
                             const elem_to_str_t elem_to_str,
                             const size_t start_ind, const size_t* const ind_arr)
 {
-    if (is_valid_ptr(arr))          return -1;
-    if (is_valid_ptr(fist))         return -1;
-    if (is_valid_ptr(elem_to_str))  return -1;
-    if (is_valid_ptr(ind_arr))      return -1;
+    if (fist_is_valid_ptr(arr))          return -1;
+    if (fist_is_valid_ptr(fist))         return -1;
+    if (fist_is_valid_ptr(elem_to_str))  return -1;
+    if (fist_is_valid_ptr(ind_arr))      return -1;
     if (!elem_size)                 return -1;
 
 

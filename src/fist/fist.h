@@ -4,7 +4,7 @@
 #include <stdio.h>
 
 #include "fist_structs.h"
-#include "utils.h"
+#include "utils/utils.h"
 #include "logger/liblogger.h"
 
 

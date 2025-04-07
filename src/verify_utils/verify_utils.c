@@ -8,7 +8,7 @@
 
 #include "verify_utils.h"
 
-enum PtrState is_valid_ptr(const void* const ptr)
+enum PtrState fist_is_valid_ptr(const void* const ptr)
 {
     if (errno)
     {

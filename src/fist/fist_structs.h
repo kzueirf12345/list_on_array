@@ -3,7 +3,7 @@
 
 #include <stdio.h>
 
-#include "utils.h"
+#include "utils/utils.h"
 #include "logger/liblogger.h"
 
 typedef struct Fist

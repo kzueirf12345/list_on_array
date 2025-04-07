@@ -36,7 +36,7 @@ void DUMBER_is_init_lasserts(void)
     lassert(DUMBER_.graph_count_name,   "DUMBER_ is not init");
 }
 
-enum DumbError dumb_ctor(void)
+enum DumbError fist_dumb_ctor(void)
 {
     lassert(!DUMBER_.html_name         || !DUMBER_.html_file, "");
     lassert(!DUMBER_.dot_name          || !DUMBER_.dot_file,  "");
@@ -61,12 +61,12 @@ enum DumbError dumb_ctor(void)
 
     DUMBER_.graph_count_name = "./log/graph_count.txt";
 
-    fprintf(stderr, "dumb_ctor()\n");
+    fprintf(stderr, "fist_dumb_ctor()\n");
 
     return DUMB_ERROR_SUCCESS;
 }
 
-enum DumbError dumb_dtor(void)
+enum DumbError fist_dumb_dtor(void)
 {
     DUMBER_is_init_lasserts();
 
@@ -161,7 +161,7 @@ enum DumbError write_graph_count_in_file(void)
 enum DumbError dumb_set_out_file_(const char*  const filename, FILE** const file, 
                                   const char** const old_filename, const char* const mode);
 
-enum DumbError dumb_set_out_html_file(const char* const filename)
+enum DumbError fist_dumb_set_out_html_file(const char* const filename)
 {
     DUMBER_is_init_lasserts();
     lassert(filename, "");
@@ -169,7 +169,7 @@ enum DumbError dumb_set_out_html_file(const char* const filename)
     return dumb_set_out_file_(filename, &DUMBER_.html_file, &DUMBER_.html_name, "ab");
 }
 
-enum DumbError dumb_set_out_dot_file(const char* const filename)
+enum DumbError fist_dumb_set_out_dot_file(const char* const filename)
 {
     DUMBER_is_init_lasserts();
     lassert(filename, "");
@@ -202,7 +202,7 @@ enum DumbError dumb_set_out_file_(const char*  const filename, FILE** const file
 }
 
 
-enum DumbError dumb_set_out_png_file(const char* const filename)
+enum DumbError fist_dumb_set_out_png_file(const char* const filename)
 {
     DUMBER_is_init_lasserts();
     lassert(filename, "");
@@ -211,7 +211,7 @@ enum DumbError dumb_set_out_png_file(const char* const filename)
     return DUMB_ERROR_SUCCESS;
 }
 
-enum DumbError dumb_set_out_graph_count_file(const char* const filename)
+enum DumbError fist_dumb_set_out_graph_count_file(const char* const filename)
 {
     DUMBER_is_init_lasserts();
     lassert(filename, "");

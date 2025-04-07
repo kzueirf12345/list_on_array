@@ -28,13 +28,13 @@ const char* dumb_strerror(const enum DumbError error);
     } while(0)
 
 
-enum DumbError dumb_ctor(void);
-enum DumbError dumb_dtor(void);
+enum DumbError fist_dumb_ctor(void);
+enum DumbError fist_dumb_dtor(void);
 
-enum DumbError dumb_set_out_html_file           (const char* const filename);
-enum DumbError dumb_set_out_dot_file            (const char* const filename);
-enum DumbError dumb_set_out_png_file            (const char* const filename);
-enum DumbError dumb_set_out_graph_count_file    (const char* const filename);
+enum DumbError fist_dumb_set_out_html_file           (const char* const filename);
+enum DumbError fist_dumb_set_out_dot_file            (const char* const filename);
+enum DumbError fist_dumb_set_out_png_file            (const char* const filename);
+enum DumbError fist_dumb_set_out_graph_count_file    (const char* const filename);
 
 typedef int (*elem_to_str_t) (const void* const elem, const size_t   elem_size,
                               char* const *     str,  const size_t mx_str_size);

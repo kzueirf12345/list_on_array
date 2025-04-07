@@ -3,7 +3,7 @@
 		clean_all clean_log clean_out clean_obj clean_deps clean_txt clean_bin \
 
 
-PROJECT_NAME = list_on_array
+PROJECT_NAME = fist
 
 BUILD_DIR = ./build
 SRC_DIR = ./src
@@ -48,7 +48,7 @@ FLAGS += $(ADD_FLAGS)
 DIRS = fist verification dumb verify_utils
 BUILD_DIRS = $(DIRS:%=$(BUILD_DIR)/%)
 
-SOURCES = main.c fist/fist.c verification/verification.c dumb/dumb.c verify_utils/verify_utils.c \
+SOURCES = fist/fist.c verification/verification.c dumb/dumb.c verify_utils/verify_utils.c \
 		  dumb/dumber.c dumb/utils.c dumb/dumb_text.c dumb/dumb_graphical.c
 
 SOURCES_REL_PATH = $(SOURCES:%=$(SRC_DIR)/%)
@@ -58,20 +58,16 @@ DEPS_REL_PATH = $(OBJECTS_REL_PATH:%.o=%.d)
 
 all: build start
 
-start:
-	./$(PROJECT_NAME).out
-
-build: $(PROJECT_NAME).out
+build: lib$(PROJECT_NAME).a
 
 rebuild: clean_all build
 
 
-
-$(PROJECT_NAME).out: $(OBJECTS_REL_PATH)
-	@$(COMPILER) $(FLAGS) -o $@ $^  -L./libs/logger -llogger
+lib$(PROJECT_NAME).a: $(OBJECTS_REL_PATH)
+	ar -rcs lib$(PROJECT_NAME).a $(OBJECTS_REL_PATH) libs/logger/liblogger.a
 
 $(BUILD_DIR)/%.o : $(SRC_DIR)/%.c | ./$(BUILD_DIR)/ $(BUILD_DIRS) logger_build
-	@$(COMPILER) $(FLAGS) -I./utils -I./libs -c -MMD -MP $< -o $@
+	@$(COMPILER) $(FLAGS) -I$(SRC_DIR) -I./libs -c -MMD -MP $< -o $@
 
 -include $(DEPS_REL_PATH)
 
@@ -102,7 +98,7 @@ clean_out:
 	rm -rf ./*.out
 
 clean_obj:
-	rm -rf ./$(OBJECTS_REL_PATH)
+	rm -rf ./$(OBJECTS_REL_PATH) lib$(PROJECT_NAME).a
 
 clean_deps:
 	rm -rf ./$(DEPS_REL_PATH)
