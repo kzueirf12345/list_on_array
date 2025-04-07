@@ -15,8 +15,8 @@ size_t*         DUMBER_get_graph_count      (void);
 void DUMBER_is_init_lasserts(void);
 extern bool is_set_graph_count_;
 
-enum DumbError set_graph_count          (void);
-enum DumbError write_graph_count_in_file(void);
+enum FistDumbError set_graph_count          (void);
+enum FistDumbError write_graph_count_in_file(void);
 
 
 #endif /* LIST_ON_ARRAY_SRC_DUMB_DUMBER_H */

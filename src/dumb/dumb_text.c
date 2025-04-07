@@ -5,8 +5,6 @@
 #include "../verify_utils/verify_utils.h"
 #include "utils.h"
 
-//TODO struct for group func parametrs
-
 #define DUMB_AND_FPRINTF_(format, ...)                                                              \
         do {                                                                                        \
             fprintf((*DUMBER_get_html_file()), format, ##__VA_ARGS__);                              \

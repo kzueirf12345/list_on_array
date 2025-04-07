@@ -6,18 +6,18 @@
 #include "../fist/fist.h"
 #include "logger/liblogger.h"
 
-enum DumbError
+enum FistDumbError
 {
-    DUMB_ERROR_SUCCESS = 0,
-    DUMB_ERROR_FAILURE = 1
+    FIST_DUMB_ERROR_SUCCESS = 0,
+    FIST_DUMB_ERROR_FAILURE = 1
 };
-static_assert(DUMB_ERROR_SUCCESS == 0);
+static_assert(FIST_DUMB_ERROR_SUCCESS == 0);
 
-const char* dumb_strerror(const enum DumbError error);
+const char* dumb_strerror(const enum FistDumbError error);
 
-#define DUMB_ERROR_HANDLE(call_func, ...)                                                           \
+#define FIST_DUMB_ERROR_HANDLE(call_func, ...)                                                      \
     do {                                                                                            \
-        enum DumbError error_handler = call_func;                                                   \
+        enum FistDumbError error_handler = call_func;                                                   \
         if (error_handler)                                                                          \
         {                                                                                           \
             fprintf(stderr, "Can't " #call_func". Error: %s\n",                                     \
@@ -28,13 +28,13 @@ const char* dumb_strerror(const enum DumbError error);
     } while(0)
 
 
-enum DumbError fist_dumb_ctor(void);
-enum DumbError fist_dumb_dtor(void);
+enum FistDumbError fist_dumb_ctor(void);
+enum FistDumbError fist_dumb_dtor(void);
 
-enum DumbError fist_dumb_set_out_html_file           (const char* const filename);
-enum DumbError fist_dumb_set_out_dot_file            (const char* const filename);
-enum DumbError fist_dumb_set_out_png_file            (const char* const filename);
-enum DumbError fist_dumb_set_out_graph_count_file    (const char* const filename);
+enum FistDumbError fist_dumb_set_out_html_file           (const char* const filename);
+enum FistDumbError fist_dumb_set_out_dot_file            (const char* const filename);
+enum FistDumbError fist_dumb_set_out_png_file            (const char* const filename);
+enum FistDumbError fist_dumb_set_out_graph_count_file    (const char* const filename);
 
 typedef int (*elem_to_str_t) (const void* const elem, const size_t   elem_size,
                               char* const *     str,  const size_t mx_str_size);

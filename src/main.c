@@ -12,10 +12,10 @@ int main()
     LOGG_ERROR_HANDLE(logger_set_level_details(LOG_LEVEL_DETAILS_ALL),              logger_dtor(););
     LOGG_ERROR_HANDLE(logger_set_logout_file("./log/logout.log"),                   logger_dtor(););
 
-    DUMB_ERROR_HANDLE(fist_dumb_ctor(),                                     logger_dtor(); fist_dumb_dtor(););
-    DUMB_ERROR_HANDLE(fist_dumb_set_out_html_file("./log/dumb.html"),       logger_dtor(); fist_dumb_dtor(););
-    DUMB_ERROR_HANDLE(fist_dumb_set_out_dot_file ("./log/dumb.dot"),        logger_dtor(); fist_dumb_dtor(););
-    DUMB_ERROR_HANDLE(fist_dumb_set_out_png_file ("./log/dumb"),            logger_dtor(); fist_dumb_dtor(););
+    FIST_DUMB_ERROR_HANDLE(fist_dumb_ctor(),                                     logger_dtor(); fist_dumb_dtor(););
+    FIST_DUMB_ERROR_HANDLE(fist_dumb_set_out_html_file("./log/dumb.html"),       logger_dtor(); fist_dumb_dtor(););
+    FIST_DUMB_ERROR_HANDLE(fist_dumb_set_out_dot_file ("./log/dumb.dot"),        logger_dtor(); fist_dumb_dtor(););
+    FIST_DUMB_ERROR_HANDLE(fist_dumb_set_out_png_file ("./log/dumb"),            logger_dtor(); fist_dumb_dtor(););
 
     //====================
 
@@ -91,7 +91,7 @@ int main()
     fist_dtor(&fist);
 
     //====================
-    DUMB_ERROR_HANDLE(                                                                 fist_dumb_dtor());
+    FIST_DUMB_ERROR_HANDLE(                                                                 fist_dumb_dtor());
     LOGG_ERROR_HANDLE(                                                               logger_dtor());
     return 0;
 }
