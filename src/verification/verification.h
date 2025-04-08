@@ -35,7 +35,7 @@ enum FistError
     FIST_ERROR_LOGGER_ERROR         = 22,
     FIST_ERROR_UNKNOWN              = 30
 };
-static_assert(FIST_ERROR_SUCCESS == 0);
+static_assert(FIST_ERROR_SUCCESS == 0, "");
 
 const char* fist_strerror(const enum FistError error);
 

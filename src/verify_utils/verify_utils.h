@@ -10,7 +10,7 @@ enum PtrState
     PTR_STATES_NVALID  = 2,
     PTR_STATES_ERROR   = 3
 };
-static_assert(PTR_STATES_VALID == 0);
+static_assert(PTR_STATES_VALID == 0, "");
 
 enum PtrState fist_is_valid_ptr(const void* const ptr);
 

@@ -28,7 +28,7 @@ static const char* const HTML_INTRO_ =
 
 
 #define CASE_ENUM_TO_STRING_(error) case error: return #error
-const char* dumb_strerror(const enum FistDumbError error)
+const char* fist_dumb_strerror(const enum FistDumbError error)
 {
     switch (error)
     {

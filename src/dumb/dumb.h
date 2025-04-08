@@ -11,17 +11,17 @@ enum FistDumbError
     FIST_DUMB_ERROR_SUCCESS = 0,
     FIST_DUMB_ERROR_FAILURE = 1
 };
-static_assert(FIST_DUMB_ERROR_SUCCESS == 0);
+static_assert(FIST_DUMB_ERROR_SUCCESS == 0, "");
 
-const char* dumb_strerror(const enum FistDumbError error);
+const char* fist_dumb_strerror(const enum FistDumbError error);
 
 #define FIST_DUMB_ERROR_HANDLE(call_func, ...)                                                      \
     do {                                                                                            \
-        enum FistDumbError error_handler = call_func;                                                   \
+        enum FistDumbError error_handler = call_func;                                               \
         if (error_handler)                                                                          \
         {                                                                                           \
             fprintf(stderr, "Can't " #call_func". Error: %s\n",                                     \
-                            dumb_strerror(error_handler));                                          \
+                            fist_dumb_strerror(error_handler));                                     \
             __VA_ARGS__                                                                             \
             return error_handler;                                                                   \
         }                                                                                           \
