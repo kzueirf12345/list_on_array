@@ -47,14 +47,14 @@ enum FistError fist_ctor_NOT_USE(fist_t* const fist, const size_t elem_size, con
     }
     fist->next[fist->capacity] = 0;
     
-    FIST_VERIFY(fist, NULL);
+    FIST_VERIFY_ASSERT(fist, NULL);
 
     return FIST_ERROR_SUCCESS;
 }
 
 void fist_dtor(fist_t* const fist)
 {
-    FIST_VERIFY(fist, NULL);
+    FIST_VERIFY_ASSERT(fist, NULL);
 
     free(fist->data); IF_DEBUG(fist->data = NULL;)
     free(fist->next); IF_DEBUG(fist->next = NULL;)
@@ -73,7 +73,7 @@ static enum FistError fist_resize_(fist_t* const fist);
 
 enum FistError fist_push(fist_t* const fist, const size_t prev_ind, const void* const add_elem)
 {
-    FIST_VERIFY(fist, NULL);
+    FIST_VERIFY_ASSERT(fist, NULL);
     lassert(add_elem, "");
     lassert(prev_ind <= fist->capacity, "");
 
@@ -92,13 +92,13 @@ enum FistError fist_push(fist_t* const fist, const size_t prev_ind, const void* 
 
     ++fist->size;
 
-    FIST_VERIFY(fist, NULL);
+    FIST_VERIFY_ASSERT(fist, NULL);
     return FIST_ERROR_SUCCESS;
 }
 
 enum FistError fist_pop (fist_t* const fist, const size_t del_ind)
 {
-    FIST_VERIFY(fist, NULL);
+    FIST_VERIFY_ASSERT(fist, NULL);
     lassert(0 < del_ind && del_ind <= fist->capacity, "");
     lassert(fist->size, "");
     lassert(del_ind == fist->next[0] || fist->prev[del_ind] != 0, "del_ind is invalid");
@@ -115,7 +115,7 @@ enum FistError fist_pop (fist_t* const fist, const size_t del_ind)
 
     --fist->size;
 
-    FIST_VERIFY(fist, NULL);
+    FIST_VERIFY_ASSERT(fist, NULL);
     return FIST_ERROR_SUCCESS;
 }
 
@@ -126,7 +126,7 @@ static enum FistError fist_resize_arr_(void** arr,                const size_t e
 
 static enum FistError fist_resize_(fist_t* const fist)
 {
-    FIST_VERIFY(fist, NULL);
+    FIST_VERIFY_ASSERT(fist, NULL);
 
     size_t new_capacity = 0;
 
@@ -159,7 +159,7 @@ static enum FistError fist_resize_(fist_t* const fist)
         fist->capacity = new_capacity - 1;
     }
 
-    FIST_VERIFY(fist, NULL);
+    FIST_VERIFY_ASSERT(fist, NULL);
     return FIST_ERROR_SUCCESS;
 }
 
@@ -217,7 +217,7 @@ static void* recalloc_(void* ptrmem, const size_t old_number, const size_t old_s
 
 enum FistError fist_linearize(fist_t* const fist, size_t new_capacity)
 {
-    FIST_VERIFY(fist, NULL);
+    FIST_VERIFY_ASSERT(fist, NULL);
     
     if (new_capacity == 0) new_capacity = fist->capacity;
 
@@ -269,15 +269,31 @@ enum FistError fist_linearize(fist_t* const fist, size_t new_capacity)
     fist->free     = fist->size + 1;
     fist->capacity = new_capacity;
 
-    FIST_VERIFY(fist, NULL);
+    FIST_VERIFY_ASSERT(fist, NULL);
     return FIST_ERROR_SUCCESS;
 }
 
 //-------------------------------------
 
+size_t fist_find(const fist_t* const fist, const void* const elem)
+{
+    FIST_VERIFY_ASSERT(fist, NULL);
+    lassert(elem, "");
+
+    for (size_t ind = fist->next[0]; ind != 0; ind = fist->next[ind])
+    {
+        if (memcmp(elem, (char*)fist->data + ind * fist->elem_size, fist->elem_size) == 0)
+        {
+            return ind;
+        }
+    }
+    
+    return 0;
+}
+
 enum FistError fist_print(FILE* out, const fist_t* const fist)
 {
-    FIST_VERIFY(fist, NULL);
+    FIST_VERIFY_ASSERT(fist, NULL);
     lassert(out, "");
 
 
@@ -363,7 +379,7 @@ enum FistError fist_print(FILE* out, const fist_t* const fist)
 
     fprintf(out, "\n");
 
-    FIST_VERIFY(fist, NULL);
+    FIST_VERIFY_ASSERT(fist, NULL);
     return FIST_ERROR_SUCCESS;
 }
 

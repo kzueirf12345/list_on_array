@@ -54,12 +54,12 @@ const char* fist_strerror(const enum FistError error);
 
 #ifndef NDEBUG
 
-enum FistError fist_verify_NOT_USE(const fist_t* const fist);
+enum FistError fist_verify(const fist_t* const fist);
 
 
-#define FIST_VERIFY(fist, elem_to_str)                                                              \
+#define FIST_VERIFY_ASSERT(fist, elem_to_str)                                                       \
         do {                                                                                        \
-            const enum FistError error = fist_verify_NOT_USE(fist);                                 \
+            const enum FistError error = fist_verify(fist);                                         \
             if (error)                                                                              \
             {                                                                                       \
                 FIST_DUMB(fist, elem_to_str);                                                       \

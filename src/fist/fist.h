@@ -31,6 +31,8 @@ enum FistError fist_push     (fist_t* const fist, const size_t prev_ind, const v
 enum FistError fist_pop      (fist_t* const fist, const size_t del_ind);
 enum FistError fist_linearize(fist_t* const fist, size_t new_capacity);
 
+size_t         fist_find     (const fist_t* const fist, const void* const elem);
+
 enum FistError fist_print(FILE* out, const fist_t* const fist);
 
 
