@@ -62,9 +62,9 @@ void fist_dumb_NOT_USE (const fist_t* const fist, const place_in_code_t call_pla
 
     DUMB_AND_FPRINTF_("\n==FIST DUMB==\nDate: %s\nTime: %s\n\n", __DATE__, __TIME__);
 
-    const char* fist_buf  = fist_handle_invalid_ptr(fist);
-    const char* file_buf  = fist_handle_invalid_ptr(call_place.file);
-    const char* func_buf  = fist_handle_invalid_ptr(call_place.func);
+    const char* fist_buf  = handle_invalid_ptr(fist);
+    const char* file_buf  = handle_invalid_ptr(call_place.file);
+    const char* func_buf  = handle_invalid_ptr(call_place.func);
     file_buf =  file_buf  ? file_buf :          call_place.file;
     func_buf =  func_buf  ? func_buf :          call_place.func;
     const int   line_buf  =                     call_place.line <= 0
@@ -78,9 +78,9 @@ void fist_dumb_NOT_USE (const fist_t* const fist, const place_in_code_t call_pla
         return;
     }
 
-    const char*           fist_name_buf      = fist_handle_invalid_ptr( fist->name           );
-    const char*           fist_file_burn_buf = fist_handle_invalid_ptr( fist->burn_place.file);
-    const char*           fist_func_burn_buf = fist_handle_invalid_ptr( fist->burn_place.func);
+    const char*           fist_name_buf      = handle_invalid_ptr( fist->name           );
+    const char*           fist_file_burn_buf = handle_invalid_ptr( fist->burn_place.file);
+    const char*           fist_func_burn_buf = handle_invalid_ptr( fist->burn_place.func);
     fist_name_buf       = fist_name_buf      ? fist_name_buf      : fist->name;
     fist_file_burn_buf  = fist_file_burn_buf ? fist_file_burn_buf : fist->burn_place.file;
     fist_func_burn_buf  = fist_func_burn_buf ? fist_func_burn_buf : fist->burn_place.func;

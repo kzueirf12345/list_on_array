@@ -21,7 +21,7 @@ int dumb_physical_arr(const fist_t* const fist,
 {
     if (fist_is_valid_ptr(arr_name)) return -1;
 
-    const char* fist_arr_buf = fist_handle_invalid_ptr(arr);
+    const char* fist_arr_buf = handle_invalid_ptr(arr);
     if (fist_arr_buf)
     {
         DUMB_AND_FPRINTF_("\t%s[%s]\n", arr_name, fist_arr_buf);
@@ -99,7 +99,7 @@ int dumb_logical_arr(const fist_t* const fist,
 {
     if (fist_is_valid_ptr(arr_name)) return -1;
 
-    const char* const fist_arr_buf = fist_handle_invalid_ptr(arr);
+    const char* const fist_arr_buf = handle_invalid_ptr(arr);
     if (fist_arr_buf)
     {
         DUMB_AND_FPRINTF_("\t%s[%s]\n", arr_name, fist_arr_buf);

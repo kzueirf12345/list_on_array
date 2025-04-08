@@ -92,7 +92,7 @@ int fist_is_empty_file(FILE* file)
     return res;
 }
 
-const char* fist_handle_invalid_ptr(const void* const check_ptr)
+const char* handle_invalid_ptr(const void* const check_ptr)
 {
     switch (fist_is_valid_ptr(check_ptr))
     {
