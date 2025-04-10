@@ -47,8 +47,6 @@ const char* fist_strerror(const enum FistError error) {
 }
 #undef CASE_ENUM_TO_STRING_
 
-#ifndef NDEBUG
-
 enum FistError fist_verify(const fist_t* const fist) {
     switch (fist_is_valid_ptr(fist)) {
         case PTR_STATES_VALID:
@@ -148,5 +146,3 @@ enum FistError fist_verify(const fist_t* const fist) {
 
     return FIST_ERROR_SUCCESS;
 }
-
-#endif /*NDEBUG*/

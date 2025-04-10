@@ -46,7 +46,7 @@ enum FistError fist_ctor_NOT_USE(fist_t* const fist, const size_t elem_size, con
         fist->next[ind] = ind + 1;
     }
     fist->next[fist->capacity] = 0;
-    
+
     FIST_VERIFY_ASSERT(fist, NULL);
 
     return FIST_ERROR_SUCCESS;

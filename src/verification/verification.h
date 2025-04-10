@@ -52,10 +52,9 @@ const char* fist_strerror(const enum FistError error);
     } while(0)
 
 
-#ifndef NDEBUG
-
 enum FistError fist_verify(const fist_t* const fist);
 
+#ifndef NDEBUG
 
 #define FIST_VERIFY_ASSERT(fist, elem_to_str)                                                       \
         do {                                                                                        \
@@ -69,7 +68,7 @@ enum FistError fist_verify(const fist_t* const fist);
 
 #else /*NDEBUG*/
 
-#define FIST_VERIFY(fist, elem_to_str) do {} while(0)
+#define FIST_VERIFY_ASSERT(fist, elem_to_str) do {} while(0)
 
 #endif /*NDEBUG*/
 

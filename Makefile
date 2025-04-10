@@ -7,7 +7,7 @@ PROJECT_NAME = fist
 
 BUILD_DIR = ./build
 SRC_DIR = ./src
-COMPILER = gcc
+COMPILER ?= gcc
 
 DEBUG_ ?= 1
 
@@ -36,6 +36,7 @@ RELEASE_FLAGS = -DNDEBUG -O2
 
 ifneq ($(DEBUG_),0)
 FLAGS += $(DEBUG_FLAGS)
+
 else
 FLAGS += $(RELEASE_FLAGS)
 endif

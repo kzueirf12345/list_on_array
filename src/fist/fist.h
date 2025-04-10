@@ -21,7 +21,7 @@ enum FistError fist_ctor_NOT_USE(fist_t* const fist, const size_t elem_size, con
 #else /*NDEBUG*/
 
 #define FIST_CTOR(fist, elem_size, capacity)                                                        \
-        fist_ctor_NOT_USE(fist, elem_size, capacity, (place_in_code_t) {})
+        fist_ctor_NOT_USE(fist, elem_size, capacity, NULL, (place_in_code_t) {})
 
 #endif /*NDEBUG*/
 
