@@ -1,0 +1,39 @@
+     1                                  section .text
+     2                                  
+     3                                  global fist_find_32
+     4                                  
+     5                                  ;;; ---------------------------------------------
+     6                                  ;;; Descript:   find list elem index, if elem_size == 32 bytes
+     7                                  ;;; Entry:      rdi = addr elem
+     8                                  ;;;             rsi = data
+     9                                  ;;;             rdx = coust bytes data
+    10                                  ;;; Exit:       rax = index finded elem (0 if not find)
+    11                                  ;;; Destroy:    rcx, ymm0-2
+    12                                  ;;; ---------------------------------------------
+    13                                  fist_find_32:
+    14 00000000 4885D2                      test rdx, rdx                                           ; check to zero size
+    15 00000003 7424                    je .ExitFailure
+    16                                  
+    17 00000005 B920000000                  mov rcx, 32                                             ; rcx - counter
+    18 0000000A C5FD6F07                    vmovdqa ymm0, [rdi]                                     ; ymm0 - elem
+    19                                  .Cicle:
+    20 0000000E C5FD6F0C0E                  vmovdqa ymm1, [rsi + rcx]                               ; ymm1 - elem in data
+    21 00000013 C5FD74D1                    vpcmpeqb ymm2, ymm0, ymm1                               ; ymm2 - result cmp elem and elem in data
+    22 00000017 C5FDD7C2                    vpmovmskb eax, ymm2                                     ; eax - cmp mask
+    23 0000001B 83F8FF                      cmp eax, 0xFFFFFFFF                                     ; check if all bytes match
+    24 0000001E 7410                    je .ExitSuccess
+    25                                  
+    26 00000020 4883C120                    add rcx, 32                                             ; rcx - next ind
+    27 00000024 4839D1                      cmp rcx, rdx                                            ; check to end data
+    28 00000027 7CE5                    jl .Cicle
+    29                                  
+    30                                  .ExitFailure:
+    31 00000029 4831C0                      xor rax, rax
+    32 0000002C C5F877                      vzeroupper                                              ; for optimize sse instrs
+    33 0000002F C3                          ret
+    34                                  
+    35                                  .ExitSuccess:
+    36 00000030 4889C8                      mov rax, rcx                                            ; rax - index finded elem
+    37 00000033 48C1E805                    shr rax, 5
+    38 00000037 C5F877                      vzeroupper                                              ; for optimize sse instrs
+    39 0000003A C3                          ret

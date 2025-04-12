@@ -1,4 +1,5 @@
 #include <string.h>
+#include <stdint.h>
 
 #include "fist.h"
 #include "logger/liblogger.h"
@@ -15,10 +16,17 @@ enum FistError fist_ctor_NOT_USE(fist_t* const fist, const size_t elem_size, con
     IF_DEBUG(fist->burn_place = burn_place;)
     IF_DEBUG(fist->name = name;)
 
-    fist->data = calloc(1 + capacity, elem_size);
+    
+    fist->data = aligned_alloc(elem_size, (1 + capacity) * elem_size);
     if (!fist->data)
     {
-        perror("Can't calloc fist->data");
+        perror("Can't alligned_alloc fist->data");
+        return FIST_ERROR_STANDARD_ERRNO;
+    }
+
+    if (!memset(fist->data, 0, (1 + capacity) * elem_size))
+    {
+        perror("Can't memset fist->data");
         return FIST_ERROR_STANDARD_ERRNO;
     }
 
@@ -275,16 +283,25 @@ enum FistError fist_linearize(fist_t* const fist, size_t new_capacity)
 
 //-------------------------------------
 
+extern size_t fist_find_32(const void* const elem, const void* const data, const size_t size);
+
 size_t fist_find(const fist_t* const fist, const void* const elem)
 {
     FIST_VERIFY_ASSERT(fist, NULL);
     lassert(elem, "");
 
-    for (size_t ind = fist->next[0]; ind != 0; ind = fist->next[ind])
+    if (fist->elem_size == 32)
     {
-        if (memcmp(elem, (char*)fist->data + ind * fist->elem_size, fist->elem_size) == 0)
+        return fist_find_32(elem, fist->data, fist->capacity * fist->elem_size);
+    }
+    else
+    {
+        for (size_t ind = fist->next[0]; ind != 0; ind = fist->next[ind])
         {
-            return ind;
+            if (memcmp(elem, (char*)fist->data + ind * fist->elem_size, fist->elem_size) == 0)
+            {
+                return ind;
+            }
         }
     }
     
