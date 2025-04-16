@@ -290,22 +290,7 @@ size_t fist_find(const fist_t* const fist, const void* const elem)
     FIST_VERIFY_ASSERT(fist, NULL);
     lassert(elem, "");
 
-    if (fist->elem_size == 32)
-    {
-        return fist_find_32(elem, fist->data, fist->capacity * fist->elem_size);
-    }
-    else
-    {
-        for (size_t ind = fist->next[0]; ind != 0; ind = fist->next[ind])
-        {
-            if (memcmp(elem, (char*)fist->data + ind * fist->elem_size, fist->elem_size) == 0)
-            {
-                return ind;
-            }
-        }
-    }
-    
-    return 0;
+    return fist_find_32(elem, fist->data, fist->capacity * fist->elem_size);
 }
 
 enum FistError fist_print(FILE* out, const fist_t* const fist)
